@@ -1,0 +1,41 @@
+! ------------------------------------------------
+! - Macro to create spline from multiple points
+!   Gets as input the name of a vector with
+!   keypoint ids
+! ----- Should update with slopes also on last spline
+! can use the initial point - easy, plus the last point going to same coordinates but with x< (dx)
+! ------------------------------------------------
+! create_spline.mac,klist
+! create_spline,Npoints%ss%,kspline_%ss%_in
+! ---
+! Returns lspline and lstr as line indexes for the created lines, and lseg for the segmented version
+! ------------------------------------------------
+! Arguments
+Npoints = arg1
+kspline = arg2
+! ------------------------------------------------
+alls
+*get,lmax,line,,num,max
+numstr,line,lmax+1
+! ------------------------------------------------
+! Splines - In / Tangent Vector was actually making it worse
+lsel,none
+
+! First line as straight line
+pp = 1
+l,%kspline%(pp),%kspline%(pp+1)
+lstr = _return
+pp = pp + 1
+
+! Spline
+FLST,3,Npoints-1,3
+*do,pp,2,Npoints
+  kp_ii = %kspline%(pp)
+    FITEM,3,%kspline%(pp)
+*enddo
+BSPLIN, ,P51X
+cm,line_seg,line
+
+! Get Name
+lsel,u,line,,lstr
+*get,lspline,line,,num,min

@@ -1,0 +1,11 @@
+! Element number grab, used many times
+alls
+*get,knum,kp,,num,max
+*get,lnum,line,,num,max
+*get,anum,area,,num,max
+numstr,kp,knum
+numstr,line,lnum
+numstr,area,anum
+asel,none
+lsel,none
+ksel,none

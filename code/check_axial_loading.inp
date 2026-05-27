@@ -1,0 +1,123 @@
+! ------------------------------------------------------
+! - Solution
+/solu
+tref,293
+! neqit,100
+nind = 0
+
+midplane_shim = 0.0e-3
+midplane_z0   = 0
+interf_pole   = 400e-6
+poletip_shim  = 400e-6
+oversize      = 400e-6
+interf_eplate = -1000e-6
+
+ncases  = 10
+dinterf = 500e-6
+
+! ----------------------------------------------
+! - Step 1 - Assembly with Interference
+! For the moment might be better on the filler 
+! as we need to separate pole ss/end contacts
+/title, Collaring
+nind = nind + 1
+
+! Mid-plane shim
+cmsel,s,layer1
+cmsel,a,layer2
+alls,below,volu
+nsel,r,loc,y,-mesh_size/10,mesh_size/10
+nsel,r,loc,z,midplane_z0,length
+d,all,uy,midplane_shim
+
+! kill the yoke for Collaring
+cmsel,s,yoke
+allsel,below,volu
+ekill,all
+! fix the displacement
+d,all,ux,0
+d,all,uy,0
+d,all,uz,0
+! negative contact between the yoke and collar
+rmodif,33,10,-1e-3
+rmodif,34,10,-1e-3
+
+! Pole Shim - Tabular
+! interf_pole = 500e-6
+! L_shim = 500e-3
+! *dim,pshim_profile,table,4,,,Z,,,0
+! *TAXIS,pshim_profile(1),1,0,L_shim,L_shim+1e-6,length
+! pshim_profile(1,1) = interf_pole, interf_pole, 0, 0
+
+! rmodif,23,10,%pshim_profile%
+! rmodif,24,10,%pshim_profile%
+
+! New strategy with just straight section
+! top collar
+rmodif,50,10,interf_pole
+rmodif,52,10,interf_pole
+! collar fil
+rmodif,51,10,interf_pole
+rmodif,53,10,interf_pole
+! pole tip
+rmodif,23,10,poletip_shim
+rmodif,24,10,poletip_shim
+! coil oversize
+rmodif,21,10,oversize
+rmodif,22,10,oversize
+! negative contact for end plate
+rmodif,40,10,-1e-3
+
+! -----------------
+! - Shim Check
+! cncheck,post
+! /post1
+! esel,s,type,,23
+! esel,a,type,,24
+! plnsol,cont,pene
+! -----------------
+
+
+*do,icase,0,ncases,1
+ interf = interf_eplate+dinterf*icase
+ nind = icase+1
+
+ /title, case-%icase%, %interf*1e+3%-mm interference
+ 
+ rmodif,40,10,interf
+ 
+ allsel
+ deltim,1.0
+ neqit,30
+ time,nind
+ solve
+*enddo
+
+! ------------------------
+! Store
+finish
+save
+
+
+/post1
+*cfopen,eplate_interf,txt
+*vwrite,'interf(mm)','fz(kN)'
+(2A14)
+
+*do,icase,0,ncases,1
+ set,icase+1
+ 
+ interf = interf_eplate+dinterf*icase
+ 
+ cmsel,s,shell
+ allsel,below,volu
+ nsel,r,loc,z,loc,0
+ fsum,rsys
+ *get,fzload,fsum,0,item,fz
+ 
+*vwrite,interf*1e+6,fzload*4*1e-3
+(2F14.1)
+
+*enddo
+
+*cfclos

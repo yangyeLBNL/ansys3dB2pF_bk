@@ -1,0 +1,1164 @@
+! resume,B2pF_3D,db
+! ------------------------------------------------------
+! - Define Contacts
+! Coil pack, layer-1 - Coil radial insulation, layer-1
+!*use,ContactPropMacro.mac,10,'conta174',0,3,mu_all,0e-6,110,'targe170'
+*use,ContactPropMacro.mac,10,'conta174',0,1,mu_all,0e-6,110,'targe170'
+
+! Coil radial insulation, layer-1 - Coil pack, layer-2
+!*use,ContactPropMacro.mac,11,'conta174',0,3,mu_all,0e-6,111,'targe170'
+*use,ContactPropMacro.mac,11,'conta174',0,1,mu_all,0e-6,111,'targe170'
+
+! Coil pack, layer-2 - Coil radial insulation, layer-2
+*use,ContactPropMacro.mac,12,'conta174',0,4,mu_all,0e-6,112,'targe170'
+! *use,ContactPropMacro.mac,12,'conta174',5,1,mu_all,0e-6,112,'targe170'
+
+! End spacer - Wedge
+*use,ContactPropMacro.mac,13,'conta174',0,1,mu_all,0e-6,113,'targe170'
+
+! Coil - Front / Can easily be separated from pole as I have separate pole/wedge surfaces
+! Coil back side, layer-1 - Wedge front side, layer-1 (only for straight section)
+*use,ContactPropMacro.mac,20,'conta174',0,3,mu_all,0e-6,120,'targe170'
+
+! Coil front side, layer-1 - Wedge back side, layer-1 (only for straight section)
+*use,ContactPropMacro.mac,21,'conta174',0,3,mu_all,0e-6,121,'targe170'
+
+! Coil-1 back side, layer-1 - End spacer-1 front side, layer-1
+*use,ContactPropMacro.mac,22,'conta174',0,3,mu_all,0e-6,122,'targe170'
+
+! Coil-2 back side, layer-1 - End spacer-2 front side, layer-1
+*use,ContactPropMacro.mac,23,'conta174',0,3,mu_all,0e-6,123,'targe170'
+
+! Coil-3 back side, layer-1 - End spacer-3 front side, layer-1
+*use,ContactPropMacro.mac,24,'conta174',0,3,mu_all,0e-6,124,'targe170'
+
+! Coil-4 back side, layer-1 - End shoe front side, layer-1
+*use,ContactPropMacro.mac,25,'conta174',0,3,mu_all,0e-6,125,'targe170'
+
+! Coil, layer-1 - Pole tip, layer-1
+*use,ContactPropMacro.mac,26,'conta174',0,3,mu_all,0e-6,126,'targe170'
+
+! Coil-2 front side, layer-1 - End spacer-1 back side, layer-1
+*use,ContactPropMacro.mac,27,'conta174',0,3,mu_all,0e-6,127,'targe170'
+
+! Coil-3 front side, layer-1 - End spacer-2 back side, layer-1
+*use,ContactPropMacro.mac,28,'conta174',0,3,mu_all,0e-6,128,'targe170'
+
+! Coil-4 front side, layer-1 - End spacer-3 back side, layer-1
+*use,ContactPropMacro.mac,29,'conta174',0,3,mu_all,0e-6,129,'targe170'
+
+! Coil back side, layer-2 - Wedge front side, layer-2
+*use,ContactPropMacro.mac,80,'conta174',0,3,mu_all,0e-6,180,'targe170'
+
+! Coil front side, layer-2 - Wedge back side, layer-2
+*use,ContactPropMacro.mac,81,'conta174',0,3,mu_all,0e-6,181,'targe170'
+
+! Coil-1 back side, layer-2 - End spacer-1 front side, layer-2
+*use,ContactPropMacro.mac,82,'conta174',0,3,mu_all,0e-6,182,'targe170'
+
+! Coil-2 back side, layer-2 - End spacer-2 front side, layer-2
+*use,ContactPropMacro.mac,83,'conta174',0,3,mu_all,0e-6,183,'targe170'
+
+! Coil-3 back side, layer-2 - End spacer-3 front side, layer-2
+*use,ContactPropMacro.mac,84,'conta174',0,3,mu_all,0e-6,184,'targe170'
+
+! Coil-4 back side, layer-2 - End shoe front side, layer-2
+*use,ContactPropMacro.mac,85,'conta174',0,3,mu_all,0e-6,185,'targe170'
+
+! Coil, layer-2 - Pole tip, layer-2
+*use,ContactPropMacro.mac,86,'conta174',0,3,mu_all,0e-6,186,'targe170'
+
+! Coil-2 front side, layer-2 - End spacer-1 back side, layer-2
+*use,ContactPropMacro.mac,87,'conta174',0,3,mu_all,0e-6,187,'targe170'
+
+! Coil-3 front side, layer-2 - End spacer-2 back side, layer-2
+*use,ContactPropMacro.mac,88,'conta174',0,3,mu_all,0e-6,188,'targe170'
+
+! Coil-4 front side, layer-2 - End spacer-3 back side, layer-2
+*use,ContactPropMacro.mac,89,'conta174',0,3,mu_all,0e-6,189,'targe170'
+
+! coil 21 - coil 22 at straight section
+*use,ContactPropMacro.mac,90,'conta174',0,3,mu_all,0e-6,190,'targe170'
+
+! coil 23 - coil 24 at straight section
+*use,ContactPropMacro.mac,91,'conta174',0,3,mu_all,0e-6,191,'targe170'
+
+! Coil - Internal
+! *use,ContactPropMacro.mac,31,'conta174',0,1,mu_all,0e-6,131,'targe170'
+
+! Coil 1 - Pole 1
+! *use,ContactPropMacro.mac,21,'conta174',0,1,mu_all,0e-6,121,'targe170'
+
+! ! Coil 2 - Pole 2
+! *use,ContactPropMacro.mac,22,'conta174',0,1,mu_all,0e-6,122,'targe170'
+
+! ! Coil 1 - Wedge 1
+! *use,ContactPropMacro.mac,31,'conta174',5,1,mu_all,0e-6,131,'targe170'
+
+! ! Coil 2 - Wedge 2
+! *use,ContactPropMacro.mac,32,'conta174',5,1,mu_all,0e-6,132,'targe170'
+! ------------------------------------------------------
+! Split coil-pole tip
+*do,ll,1,Nlayer
+	cmsel,s,poletip%ll%
+	vgen,2,all, , , , , , , , 0
+	cm,tmp,volu
+	cmsel,s,poletip%ll%
+	alls,below,volu
+	vclear,all
+	vdele,all, , , 1
+	cmsel,s,tmp
+	cm,poletip%ll%,volu
+	cmdele,tmp
+*enddo
+
+! Split Coil-Wedge
+*do,ll,1,Nlayer
+	cmsel,s,wedge%ll%
+	vgen,2,all, , , , , , , , 0
+	cm,tmp,volu
+	cmsel,s,wedge%ll%
+	alls,below,volu
+	vclear,all
+	vdele,all, , , 1
+	cmsel,s,tmp
+	cm,wedge%ll%,volu
+	cmdele,tmp
+*enddo
+
+! Split Coil-End spacer
+*do,ll,1,Nlayer
+	cmsel,s,espacer%ll%
+	vgen,2,all, , , , , , , , 0
+	cm,tmp,volu
+	cmsel,s,espacer%ll%
+	alls,below,volu
+	vclear,all
+	vdele,all, , , 1
+	cmsel,s,tmp
+	cm,espacer%ll%,volu
+	cmdele,tmp
+*enddo
+
+! Split End-shoe
+*do,ll,1,Nlayer
+	cmsel,s,endshoe%ll%
+	vgen,2,all, , , , , , , , 0
+	cm,tmp,volu
+	cmsel,s,endshoe%ll%
+	alls,below,volu
+	vclear,all
+	vdele,all, , , 1
+	cmsel,s,tmp
+	cm,endshoe%ll%,volu
+	cmdele,tmp
+*enddo
+
+! Split Coil
+! *do,ll,1,Nlayer
+! 	cmsel,s,coil%ll%
+! 	vgen,2,all, , , , , , , , 0
+! 	cm,tmp,volu
+! 	cmsel,s,coil%ll%
+! 	alls,below,volu
+! 	vclear,all
+! 	vdele,all, , , 1
+! 	cmsel,s,tmp
+! 	cm,coil%ll%,volu
+! 	cmdele,tmp
+! *enddo
+
+cmsel,s,coil1
+cmsel,a,wedge1
+cmsel,a,poletip1
+cmsel,a,espacer1
+cmsel,a,endshoe1
+cm,layer1,volu
+
+cmsel,s,coil2
+cmsel,a,wedge2
+cmsel,a,poletip2
+cmsel,a,espacer2
+cmsel,a,endshoe2
+cm,layer2,volu
+
+cmsel,s,coil1
+cmsel,a,coil2
+cm,coil,volu
+! ------------------------------------------------------
+! Get Surfaces
+*use,CoilContMacro_v3.mac,'coil1','acoil1_back','acoil1_front',1e-3
+*use,CoilContMacro_v3.mac,'coil2','acoil2_back','acoil2_front',1e-3
+
+*use,CoilContMacro_v3.mac,'poletip1','apoletip1_back','empty',1e-3
+*use,CoilContMacro_v3.mac,'poletip2','apoletip2_back','empty',1e-3
+cmdele,empty
+
+*use,CoilContMacro_v3.mac,'espacer1','aespacer1_back','aespacer1_front',1e-3
+*use,CoilContMacro_v3.mac,'espacer2','aespacer2_back','aespacer2_front',1e-3
+
+*use,CoilContMacro_v3.mac,'wedge1','awedge1_back','awedge1_front',1e-3
+*use,CoilContMacro_v3.mac,'wedge2','awedge2_back','awedge2_front',1e-3
+
+! the front and back surface are not set in proper
+! set the surfaces manually
+*do,i,1,Nlayer
+ cmsel,s,awedge%i%_back
+ asel,u,loc,z,coil_length-end_length
+ cm,awedge%i%_back,area
+*enddo
+
+csys,1
+
+cmsel,s,awedge1_back
+allsel,below,area
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,awedge11_front,area
+
+cmsel,s,awedge1_back
+cmsel,u,awedge11_front
+allsel,below,area
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,awedge11_back,area
+
+cmsel,s,awedge1_back
+cmsel,u,awedge11_front
+cmsel,u,awedge11_back
+allsel,below,area
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,awedge12_front,area
+
+cmsel,s,awedge1_back
+cmsel,u,awedge11_front
+cmsel,u,awedge11_back
+cmsel,u,awedge12_front
+allsel,below,area
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,awedge12_back,area
+
+cmsel,s,awedge1_back
+cmsel,u,awedge11_front
+cmsel,u,awedge11_back
+cmsel,u,awedge12_front
+cmsel,u,awedge12_back
+allsel,below,area
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,awedge13_front,area
+
+cmsel,s,awedge1_back
+cmsel,u,awedge11_front
+cmsel,u,awedge11_back
+cmsel,u,awedge12_front
+cmsel,u,awedge12_back
+cmsel,u,awedge13_front
+allsel,below,area
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,awedge13_back,area
+
+cmsel,s,awedge2_back
+allsel,below,area
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,awedge2_front,area
+
+cmsel,s,awedge2_back
+cmsel,u,awedge2_front
+allsel,below,area
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,awedge2_back,area
+
+cmsel,s,awedge11_back
+cmsel,a,awedge12_back
+cmsel,a,awedge13_back
+cm,awedge1_back,area
+
+cmsel,s,awedge11_front
+cmsel,a,awedge12_front
+cmsel,a,awedge13_front
+cm,awedge1_front,area
+
+! separate the end spacer - back side
+! layer-1
+csys,1
+
+cmsel,s,aespacer1_back
+allsel,below,area
+ksel,u,loc,y,90
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,aespacer11_back,area
+
+cmsel,s,aespacer1_back
+cmsel,u,aespacer11_back
+allsel,below,area
+ksel,u,loc,y,90
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,aespacer12_back,area
+
+cmsel,s,aespacer1_back
+cmsel,u,aespacer11_back
+cmsel,u,aespacer12_back
+allsel,below,area
+ksel,u,loc,y,90
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,aespacer13_back,area
+
+! layer-2
+cmsel,s,aespacer2_back
+allsel,below,area
+ksel,u,loc,y,90
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,aespacer21_back,area
+
+cmsel,s,aespacer2_back
+cmsel,u,aespacer21_back
+allsel,below,area
+ksel,u,loc,y,90
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,aespacer22_back,area
+
+cmsel,s,aespacer2_back
+cmsel,u,aespacer21_back
+cmsel,u,aespacer22_back
+allsel,below,area
+ksel,u,loc,y,90
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,aespacer23_back,area
+
+! separate the end spacer - back side
+! layer-1
+cmsel,s,aespacer1_front
+allsel,below,area
+ksel,u,loc,y,90
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,aespacer11_front,area
+
+cmsel,s,aespacer1_front
+cmsel,u,aespacer11_front
+allsel,below,area
+ksel,u,loc,y,90
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,aespacer12_front,area
+
+cmsel,s,aespacer1_front
+cmsel,u,aespacer11_front
+cmsel,u,aespacer12_front
+allsel,below,area
+ksel,u,loc,y,90
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,aespacer13_front,area
+
+! layer-2
+cmsel,s,aespacer2_front
+allsel,below,area
+ksel,u,loc,y,90
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,aespacer21_front,area
+
+cmsel,s,aespacer2_front
+cmsel,u,aespacer21_front
+allsel,below,area
+ksel,u,loc,y,90
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,aespacer22_front,area
+
+cmsel,s,aespacer2_front
+cmsel,u,aespacer21_front
+cmsel,u,aespacer22_front
+allsel,below,area
+ksel,u,loc,y,90
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,aespacer23_front,area
+
+! remove the additional surfaces
+cmsel,s,acoil1_front
+asel,u,loc,z,coil_length-end_length
+cm,acoil1_front,area
+
+cmsel,s,acoil2_front
+asel,u,loc,z,coil_length-end_length
+cm,acoil2_front,area
+
+csys,1
+
+! named each coil front and back surface 
+! layer-1
+*do,i,1,4
+ ! front side
+ cmsel,s,coil1%i%
+ allsel,below
+ asel,u,loc,z,coil_length-end_length
+ asel,u,loc,y,90
+ asel,u,loc,z,0
+ asel,u,loc,x,r11
+ asel,u,loc,x,r12
+ cm,acoil1%i%_all,area
+
+ ! select the front surface
+ cmsel,s,acoil1%i%_all
+ allsel,below,area
+ ksel,u,loc,y,90
+ *get,ymax,kp,,mxloc,y
+ ksel,r,loc,y,ymax
+ lslk,r
+ asll,r
+ cm,acoil1%i%_front,area
+
+ ! select the back surface
+ cmsel,s,acoil1%i%_all
+ cmsel,u,acoil1%i%_front
+ cm,acoil1%i%_back,area
+*enddo
+
+! layer-2
+*do,i,1,4
+ ! select the surface at the inner radius
+ cmsel,s,coil2%i%
+ allsel,below,volu
+ asel,r,loc,x,r21
+ allsel,below,area
+ *get,narea,area,0,count
+ *if,narea,eq,1,then
+  cm,tmp,area
+ *else
+  ksel,r,loc,z,0
+  *get,ymax,kp,,mxloc,y
+  cmsel,s,coil2%i%
+  allsel,below,volu
+  asel,r,loc,x,r21
+  allsel,below,area
+  ksel,r,loc,y,ymax
+  lslk,r
+  asll,r
+  cm,tmp,area
+ *endif
+
+ ! all sides
+ cmsel,s,coil2%i%
+ allsel,below,volu
+ asel,u,loc,z,coil_length-end_length
+ asel,u,loc,y,90
+ asel,u,loc,z,0
+ ! using the selected area instead of selecting r21
+ cmsel,u,tmp
+ !asel,u,loc,x,r21
+ asel,u,loc,x,r22
+ cm,acoil2%i%_all,area
+ 
+ ! front side
+ cmsel,s,acoil2%i%_all
+ allsel,below
+ ksel,r,loc,z,0
+ *get,ymax,kp,,mxloc,y
+ cmsel,s,acoil2%i%_all
+ allsel,below,area
+ ksel,r,loc,y,ymax
+ lslk,r
+ asll,r
+ cm,acoil2%i%_front,area
+
+ ! back side
+ cmsel,s,acoil2%i%_all
+ cmsel,u,acoil2%i%_front
+ allsel,below,area
+ cm,acoil2%i%_back,area
+
+*enddo
+
+ !! when I remove the r21 for the coil23, the coil end region is also removed
+ !! implement this to solve this issue
+cmsel,s,acoil23_back
+allsel,below,area
+asel,u,loc,x,r21
+cm,acoil2%i%_back,area
+ !ksel,r,loc,z,0
+ !*get,ymax,kp,,mxloc,y
+ !cmsel,s,acoil2%i%_back
+ !allsel,below,area
+ !ksel,r,loc,y,ymax
+ !lslk,r
+ !asll,r
+ !cm,tmp,area
+ 
+ !cmsel,s,acoil2%i%_back
+ !cmsel,u,tmp
+ !cm,acoil2%i%_back,area
+
+! Endshoes
+cmsel,s,endshoe1
+cmsel,a,endshoe2
+alls,below,volu
+csys,1
+seltol,1e-6
+asel,u,loc,x,r11
+asel,u,loc,x,r12
+asel,u,loc,x,r21
+asel,u,loc,x,r22
+seltol,1e-3
+asel,u,loc,y,0,1
+asel,u,loc,y,90
+asel,u,loc,z,length
+seltol,
+cm,aendshoe_front,area
+
+! separate the end shoe surface
+! layer-1
+csys,1
+cmsel,s,aendshoe_front
+allsel,below,area
+*get,rmin,kp,,mnloc,x
+ksel,r,loc,x,rmin
+lslk,r
+asll,r
+cm,aendshoe1_front,area
+
+! lyaer-2
+cmsel,s,aendshoe_front
+cmsel,u,aendshoe1_front
+cm,aendshoe2_front,area
+
+! ------------------------------------------------------
+! - Mesh Contacts
+! Layer1 - Interlay
+type,10
+
+csys,1
+real,10
+mat,10
+! Generate the target surface
+cmsel,s,interlay
+alls,below,volu
+asel,r,loc,x,r12
+nsla,s,1
+esln,s,0
+type,110
+esurf,all
+alls
+
+! Generate the contact surface
+cmsel,s,layer1
+alls,below,volu
+csys,1
+asel,r,loc,x,r12
+nsla,s,1
+esln,s,0
+type,10
+esurf,all
+alls
+
+! Layer2 - Interlay
+type,11
+
+csys,1
+real,11
+mat,11
+! Generate the target surface
+cmsel,s,interlay
+alls,below,volu
+asel,r,loc,x,r21
+nsla,s,1
+esln,s,0
+type,111
+esurf,all
+alls
+
+! Generate the contact surface
+cmsel,s,layer2
+alls,below,volu
+csys,1
+asel,r,loc,x,r21
+asel,u,loc,z,0
+nsla,s,1
+esln,s,0
+type,11
+esurf,all
+alls
+
+! Layer2 - Filler
+type,12
+
+csys,1
+real,12
+mat ,12
+! Generate the target surface
+cmsel,s,filler
+alls,below,volu
+asel,r,loc,x,r22
+nsla,s,1
+esln,s,0
+type,112
+esurf,all
+alls
+
+! Generate the contact surface
+cmsel,s,layer2
+alls,below,volu
+csys,1
+asel,r,loc,x,r22
+nsla,s,1
+esln,s,0
+type,12
+esurf,all
+alls
+
+! End spacer - Wedge
+! ------------------------------------------------------
+type,13
+
+real,13
+mat ,13
+! Generate the target surface
+cmsel,s,espacer1
+cmsel,a,espacer2
+alls,below,volu
+asel,r,loc,z,coil_length-end_length
+nsla,s,1
+esln,s,0
+type,113
+esurf,all
+alls
+
+! Generate the contact surface
+cmsel,s,wedge1
+cmsel,a,wedge2
+alls,below,volu
+asel,r,loc,z,coil_length-end_length
+nsla,s,1
+esln,s,0
+type,13
+esurf,all
+alls
+
+! ------------------------------------------------------
+! - Internal Coil Contacts
+! ------------------------------------------------------
+
+! Coil straight section front side - wedge back, layer-1
+! ------------------------------------------------------
+real,20
+mat ,20
+
+cmsel,s,awedge1_back
+nsla,s,1
+esln,s,0
+type,120
+esurf,all
+alls
+
+cmsel,s,acoil1_front
+asel,r,loc,z,0,coil_length-end_length
+allsel,below,area
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+cm,tmp,area
+
+cmsel,s,acoil1_front
+asel,r,loc,z,0,coil_length-end_length
+cmsel,u,tmp
+nsla,s,1
+esln,s,0
+type,20
+esurf,all
+alls
+
+! Coil straight section back side - wedge front, layer-1
+! ------------------------------------------------------
+real,21
+mat ,21
+
+cmsel,s,awedge1_front
+nsla,s,1
+esln,s,0
+type,121
+esurf,all
+alls
+
+cmsel,s,acoil1_back
+asel,r,loc,z,0,coil_length-end_length
+nsla,s,1
+esln,s,0
+type,21
+esurf,all
+alls
+
+! Coil end section, end spacer-1 front side - coil-1 back side (layer-1)
+!-------------------------------------------------------
+real,22
+mat ,22
+
+cmsel,s,aespacer11_front
+nsla,s,1
+esln,s,0
+type,122
+esurf,all
+alls
+
+cmsel,s,acoil11_back
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,22
+esurf,all
+alls
+
+
+! Coil end section, end spacer-2 front side - coil-2 back side (layer-1)
+!-------------------------------------------------------
+real,23
+mat ,23
+
+cmsel,s,aespacer12_front
+nsla,s,1
+esln,s,0
+type,123
+esurf,all
+alls
+
+cmsel,s,acoil12_back
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,23
+esurf,all
+alls
+
+! Coil end section, end spacer-3 front side - coil-3 back side (layer-1)
+!-------------------------------------------------------
+real,24
+mat ,24
+
+cmsel,s,aespacer13_front
+nsla,s,1
+esln,s,0
+type,124
+esurf,all
+alls
+
+cmsel,s,acoil13_back
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,24
+esurf,all
+alls
+
+! Coil end section, end shoe front side - coil-4 back side (layer-1)
+!-------------------------------------------------------
+real,25
+mat ,25
+
+cmsel,s,aendshoe1_front
+nsla,s,1
+esln,s,0
+type,125
+esurf,all
+alls
+
+cmsel,s,acoil14_back
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,25
+esurf,all
+alls
+
+! Coil - Pole tip, Layer 1
+! ------------------------------------------------------
+real,26
+mat ,26
+
+cmsel,s,apoletip1_back
+nsla,s,1
+esln,s,0
+type,126
+esurf,all
+alls
+
+cmsel,s,coil11
+allsel,below
+cmsel,r,acoil1_front
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,26
+esurf,all
+alls
+
+! Coil end section, end shoe-1 back side - coil-2 front side (layer-1)
+!-------------------------------------------------------
+real,27
+mat ,27
+
+cmsel,s,aespacer11_back
+nsla,s,1
+esln,s,0
+type,127
+esurf,all
+alls
+
+cmsel,s,acoil12_front
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,27
+esurf,all
+alls
+
+! Coil end section, end shoe-2 back side - coil-3 front side (layer-1)
+!-------------------------------------------------------
+real,28
+mat ,28
+
+cmsel,s,aespacer12_back
+nsla,s,1
+esln,s,0
+type,128
+esurf,all
+alls
+
+cmsel,s,acoil13_front
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,28
+esurf,all
+alls
+
+! Coil end section, end shoe-3 back side - coil-4 front side (layer-1)
+!-------------------------------------------------------
+real,29
+mat ,29
+
+cmsel,s,aespacer13_back
+nsla,s,1
+esln,s,0
+type,129
+esurf,all
+alls
+
+cmsel,s,acoil14_front
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,29
+esurf,all
+alls
+
+! Coil straight section front side - wedge back, layer-2
+! ------------------------------------------------------
+real,80
+mat ,80
+
+cmsel,s,awedge2_back
+nsla,s,1
+esln,s,0
+type,180
+esurf,all
+alls
+
+! select the coil surface touching to the wedge
+csys,1
+cmsel,s,awedge2_back
+allsel,below,area
+*get,tmax,kp,,mxloc,y
+
+cmsel,s,acoil2_front
+asel,r,loc,z,0,coil_length-end_length
+allsel,below,area
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+nsla,s,1
+esln,s,0
+type,80
+esurf,all
+alls
+
+! Coil straight section back side - wedge front, layer-2
+! ------------------------------------------------------
+real,81
+mat ,81
+
+cmsel,s,awedge2_front
+nsla,s,1
+esln,s,0
+type,181
+esurf,all
+alls
+
+csys,1
+cmsel,s,awedge2_front
+allsel,below,area
+*get,tmax,kp,,mxloc,y
+
+cmsel,s,acoil2_back
+asel,r,loc,z,0,coil_length-end_length
+allsel,below,area
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+nsla,s,1
+esln,s,0
+type,81
+esurf,all
+alls
+
+! Coil end section, end spacer-1 front side - coil-1 back side (layer-2)
+! ------------------------------------------------------
+real,82
+mat ,82
+
+cmsel,s,aespacer21_front
+nsla,s,1
+esln,s,0
+type,182
+esurf,all
+alls
+
+cmsel,s,acoil21_back
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,82
+esurf,all
+alls
+
+! Coil end section, end spacer-2 front side - coil-2 back side (layer-2)
+! ------------------------------------------------------
+real,83
+mat ,83
+
+cmsel,s,aespacer22_front
+nsla,s,1
+esln,s,0
+type,183
+esurf,all
+alls
+
+cmsel,s,acoil22_back
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,83
+esurf,all
+alls
+
+! Coil end section, end spacer-3 front side - coil-3 back side (layer-2)
+! ------------------------------------------------------
+real,84
+mat ,84
+
+cmsel,s,aespacer23_front
+nsla,s,1
+esln,s,0
+type,184
+esurf,all
+alls
+
+cmsel,s,acoil23_back
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,84
+esurf,all
+alls
+
+! Coil end section, end shoe front side - coil-4 back side (layer-2)
+! ------------------------------------------------------
+real,85
+mat ,85
+
+cmsel,s,aendshoe2_front
+nsla,s,1
+esln,s,0
+type,185
+esurf,all
+alls
+
+cmsel,s,acoil24_back
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,85
+esurf,all
+alls
+
+! Coil - Pole Tip, Layer 2
+! ------------------------------------------------------
+real,86
+mat ,86
+
+cmsel,s,apoletip2_back
+nsla,s,1
+esln,s,0
+type,186
+esurf,all
+alls
+
+cmsel,s,coil21
+allsel,below
+cmsel,r,acoil2_front
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,86
+esurf,all
+alls
+
+! Coil end section, end spacer-1 back side - coil-2 front side (layer-2)
+! ------------------------------------------------------
+real,87
+mat ,87
+
+cmsel,s,aespacer21_back
+nsla,s,1
+esln,s,0
+type,187
+esurf,all
+alls
+
+cmsel,s,acoil22_front
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,87
+esurf,all
+alls
+
+! Coil end section, end spacer-2 back side - coil-3 front side (layer-2)
+! ------------------------------------------------------
+real,88
+mat ,88
+
+cmsel,s,aespacer22_back
+nsla,s,1
+esln,s,0
+type,188
+esurf,all
+alls
+
+cmsel,s,acoil23_front
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,88
+esurf,all
+alls
+
+! Coil end section, end spacer-3 back side - coil-4 front side (layer-2)
+! ------------------------------------------------------
+real,89
+mat ,89
+
+cmsel,s,aespacer23_back
+nsla,s,1
+esln,s,0
+type,189
+esurf,all
+alls
+
+cmsel,s,acoil24_front
+asel,r,loc,z,coil_length-end_length,coil_length
+nsla,s,1
+esln,s,0
+type,89
+esurf,all
+alls
+
+! coil 21 - coil 22
+! ------------------------------------------------------
+real,90
+mat ,90
+
+cmsel,s,acoil21_back
+nsla,s,1
+esln,s,0
+type,190
+esurf,all
+alls
+
+cmsel,s,acoil22_front
+nsla,s,1
+esln,s,0
+type,90
+esurf,all
+alls
+
+! coil 23 - coil 24
+! ------------------------------------------------------
+real,91
+mat ,91
+
+cmsel,s,acoil23_back
+nsla,s,1
+esln,s,0
+type,191
+esurf,all
+alls
+
+cmsel,s,acoil24_front
+nsla,s,1
+esln,s,0
+type,91
+esurf,all
+alls

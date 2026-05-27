@@ -1,0 +1,242 @@
+! -------------------------------------
+! - Collar Geometry
+! Usual three piece design with
+! antisym condition on mid-plane
+! -------------------------------------
+! - Top Lamination
+! -------------------------------------
+! resume,geo,db
+! Init
+/inp,grab_nums,inp
+
+! Keypoints
+csys,1
+k,knum+1,rin_collar,0
+k,knum+2,OR_collar ,0
+k,knum+3,OR_collar ,90
+k,knum+4,rin_collar,90
+
+! Notch
+csys,1
+k,knum+5,OR_collar,t_notch2
+csys,0
+k,knum+6,OR_collar*cos(t_notch)-l_flat,OR_collar*sin(t_notch)
+csys,1
+k,knum+7,OR_collar,t_notch
+
+! Lines
+csys,0
+l,knum+1,knum+2
+l,knum+5,knum+6
+l,knum+6,knum+7
+l,knum+3,knum+4
+
+csys,1
+l,knum+2,knum+7
+l,knum+5,knum+3
+l,knum+3,knum+5
+l,knum+4,knum+1
+
+! Area
+al,all
+cm,collar_top,area
+! -------------------------------------
+! - Bottom lamination
+! -------------------------------------
+! Init
+/inp,grab_nums,inp
+
+! Keypoints
+csys,1
+k,knum+1,rin_collar,0,dz_collar
+k,knum+2,OR_collar,0,dz_collar
+k,knum+3,OR_collar,t_end,dz_collar
+
+csys,0
+k,knum+4,rin_collar,OR_collar*sin(t_end),dz_collar
+
+! Lines
+csys,0
+l,knum+1,knum+2
+l,knum+3,knum+4
+l,knum+4,knum+1
+
+csys,1
+l,knum+2,knum+3
+
+! Area
+al,all
+cm,collar_bot,area
+! -------------------------------------
+! - Filler lamination
+! ---------------------------------
+! Init
+/inp,grab_nums,inp
+
+! Keypoints
+csys,1
+k,knum+1,rin_collar,t_collar_filler,dz_collar
+
+csys,0
+k,knum+2,rin_collar,rin_collar*sin(t_collar_filler),dz_collar
+k,knum+3,rin_collar,OR_collar*sin(t_end),dz_collar
+
+csys,1
+k,knum+4,OR_collar,t_end,dz_collar
+
+! Notch
+csys,1
+k,knum+5,OR_collar,t_notch2,dz_collar
+csys,0
+k,knum+6,OR_collar*cos(t_notch)-l_flat,OR_collar*sin(t_notch),dz_collar
+csys,1
+k,knum+7,OR_collar,t_notch,dz_collar
+
+! Nose
+k,knum+8,OR_collar,90,dz_collar
+k,knum+9,rin_collar,90,dz_collar
+
+! Lines
+csys,0
+l,knum+1,knum+2
+l,knum+2,knum+3
+l,knum+3,knum+4
+
+csys,1
+l,knum+4,knum+7
+
+csys,0
+l,knum+5,knum+6
+l,knum+6,knum+7
+l,knum+8,knum+9
+
+csys,1
+l,knum+5,knum+8
+l,knum+9,knum+1
+
+! Area
+al,all
+cm,collar_fil,area
+! ---------------------------------
+! - Holes
+asel,none
+cyl4,r_collar_hole_pos*cos(t_collar_hole),r_collar_hole_pos*sin(t_collar_hole),r_collar_hole
+cm,collar_hole,area
+agen,2,all, , , , ,dz_collar
+cmsel,u,collar_hole
+cm,collar_hole_dz,area
+
+! Boolean collar top
+cmsel,s,collar_hole
+cmsel,a,collar_top
+asba,collar_top,collar_hole,,delete,delete
+cm,collar_top,area
+
+! Boolean collar filler
+cmsel,s,collar_hole_dz
+cmsel,a,collar_fil
+asba,collar_fil,collar_hole_dz,,delete,delete
+cm,collar_fil,area
+! ---------------------------------
+! - Key Slots
+/inp,grab_nums,inp
+
+! Key - Top
+rectng,x_ckey,x_ckey+w_ckey,y_ckey,y_ckey+h_ckey
+cm,ckey,area
+agen,2,all, , , , ,dz_collar
+cmsel,u,ckey
+cm,ckey_dz,area
+
+! Cut Top Collar
+cmsel,s,collar_top
+cmsel,a,ckey
+asba,collar_top,ckey,,delete,keep
+cmsel,u,ckey
+cm,collar_top,area
+
+! Cut Bottom Collar
+cmsel,s,collar_bot
+cmsel,a,ckey_dz
+asba,collar_bot,ckey_dz,,delete,delete
+cm,collar_bot,area
+
+! Separate Key
+cmsel,s,ckey
+alls,below,area
+agen,2,all
+cm,atmp,area
+cmsel,u,ckey
+cm,ckey,area
+cmsel,s,atmp
+cmsel,u,ckey
+adele,all, , , 1
+! ---------------------------------
+! Names
+cmsel,s,collar_top
+cmsel,a,collar_bot
+cmsel,a,collar_fil
+cm,collar,area
+!aatt,mat_n40
+aatt,mat_ss
+
+cmsel,s,ckey
+aatt,mat_ss
+! ---------------------------------
+! Extrude
+csys,0
+
+vsel,none
+cmsel,s,collar_top
+alls,below,area
+vext,all, , , , , length
+!vatt,mat_n40_h
+vatt,mat_ss_h
+cm,collar_top,volu
+
+vsel,none
+cmsel,s,collar_bot
+alls,below,area
+vext,all, , , , , length
+!vatt,mat_n40_h
+vatt,mat_ss_h
+cm,collar_bot,volu
+
+vsel,none
+cmsel,s,collar_fil
+alls,below,area
+vext,all, , , , , length
+!vatt,mat_n40_h
+vatt,mat_ss_h
+cm,collar_fil,volu
+
+vsel,none
+cmsel,s,ckey
+alls,below,area
+vext,all, , , , , length
+vatt,mat_ss
+cm,ckey,volu
+! ---------------------------------
+! - Mesh all
+! fine mesh at the hole
+! cmsel,s,collar_fil
+! allsel,below,volu
+! asel,r,z,loc,0
+! lsel,r,loc,x,r_collar_hole_pos*cos(t_collar_hole)-r_collar_hole,r_collar_hole_pos*cos(t_collar_hole)+r_collar_hole
+! lsel,r,loc,y,r_collar_hole_pos*sin(t_collar_hole)-r_collar_hole,r_collar_hole_pos*sin(t_collar_hole)+r_collar_hole
+! lesize,all,2e-3
+
+cmsel,s,collar_top
+cmsel,a,collar_bot
+cmsel,a,collar_fil
+cmsel,a,ckey
+alls,below,volu
+vsweep,all
+! ---------------------------------
+! Name
+cmsel,s,collar_top
+cmsel,a,collar_bot
+cmsel,a,collar_fil
+cm,collar,volu
+alls
+! ---------------------------------

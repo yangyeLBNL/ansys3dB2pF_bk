@@ -1,0 +1,501 @@
+! ------------------------------------------
+! /inp,testing,inp
+resume,B2pF_3D,db
+! ------------------------------------------
+/prep7
+/inp,grab_nums,inp
+! ------------------------------------------
+! Get Pole Shapes
+csys,1
+
+cmsel,s,pole1
+alls,below,volu
+asel,r,loc,z,0
+alls,below,area
+ksel,r,loc,x,r11
+*get,y2,kp,,mnloc,y
+alls,below,area
+ksel,r,loc,x,r12
+*get,y3,kp,,mnloc,y
+
+cmsel,s,pole2
+alls,below,volu
+asel,r,loc,z,0
+alls,below,area
+ksel,r,loc,x,r21
+*get,y7,kp,,mnloc,y
+alls,below,area
+ksel,r,loc,x,r22
+*get,y8,kp,,mnloc,y
+! ------------------------------------------
+ksel,none
+lsel,none
+asel,none
+vsel,none
+! ------------------------------------------
+! Create Keypoints
+csys,1
+k,knum+1,r11,90,0
+k,knum+2,r11,y2,0
+k,knum+3,r12,y3,0
+k,knum+4,r12,90,0
+
+k,knum+5,r21,y3,0
+k,knum+6,r21,90,0
+k,knum+7,r21,y7,0
+k,knum+8,r22,y8,0
+k,knum+9,r22,90,0
+
+k,knum+10,r22+fillerth,y8,0
+k,knum+11,r22+fillerth,90,0
+
+/pnum,kp,1
+/number
+kplot
+
+! Lines
+csys,0
+l,knum+1,knum+4
+l,knum+2,knum+3
+l,knum+4,knum+6
+l,knum+3,knum+5
+l,knum+6,knum+9
+l,knum+7,knum+8
+l,knum+9,knum+11
+l,knum+8,knum+10
+
+csys,1
+l,knum+1,knum+2
+l,knum+3,knum+4
+l,knum+6,knum+5
+l,knum+5,knum+7
+l,knum+8,knum+9
+l,knum+10,knum+11
+
+! Areas
+asel,none
+a,knum+1,knum+2,knum+3,knum+4
+cm,a1,area
+asel,none
+a,knum+4,knum+3,knum+5,knum+6
+cm,a2,area
+asel,none
+a,knum+6,knum+5,knum+7,knum+8,knum+9
+cm,a3,area
+asel,none
+a,knum+9,knum+8,knum+10,knum+11
+cm,a4,area
+
+! Volume
+vsel,none
+cmsel,s,a1
+cmsel,a,a2
+cmsel,a,a3
+cmsel,a,a4
+vext,all, , , , ,length-end_length
+vatt,mat_ss_h
+vsweep,all
+cm,collar_nose_top,volu
+! ------------------------------------------
+! - Duplicate for the filler lamination
+cmsel,s,collar_nose_top
+vgen,2,all, , , , , , , , 0
+cmsel,u,collar_nose_top
+cm,collar_nose_fil,volu
+! ------------------------------------------
+! Remove old straight section
+cmsel,s,pole1
+cmsel,a,pole2
+alls,below,volu
+asel,r,loc,z,0
+vsla,r
+alls,below,volu
+vclear,all
+vdele,all, , , 1
+! ------------------------------------------
+alls
+eplot
+
+! ------------------------------------------
+! Now the outside
+/inp,grab_nums,inp
+
+! Keypoints
+csys,1
+k,knum+1,rin_collar,0,0
+k,knum+2,OR_collar,0,0
+k,knum+3,OR_collar,90,0
+k,knum+4,rin_collar,90,0
+
+! Notch
+csys,1
+k,knum+5,OR_collar,t_notch2,0
+csys,0
+k,knum+6,OR_collar*cos(t_notch)-l_flat,OR_collar*sin(t_notch),0
+csys,1
+k,knum+7,OR_collar,t_notch,0
+
+! Special pole 2 match
+csys,1
+k,knum+8,rin_collar,y8,0
+
+! Lines
+csys,0
+l,knum+1,knum+2
+l,knum+5,knum+6
+l,knum+6,knum+7
+l,knum+3,knum+4
+
+csys,1
+l,knum+2,knum+7
+l,knum+5,knum+3
+l,knum+3,knum+5
+l,knum+4,knum+8
+l,knum+8,knum+1
+
+! Area
+al,all
+cm,collar_top,area
+! ------------------------------------------
+! - Filler lamination
+! ------------------------------------------
+! Init
+/inp,grab_nums,inp
+
+! Keypoints
+csys,1
+k,knum+1,rin_collar,t_collar_filler,0
+
+csys,0
+k,knum+2,rin_collar,rin_collar*sin(t_collar_filler),0
+k,knum+3,rin_collar,OR_collar*sin(t_end),0
+
+csys,1
+k,knum+4,OR_collar,t_end,0
+
+! Notch
+csys,1
+k,knum+5,OR_collar,t_notch2,0
+csys,0
+k,knum+6,OR_collar*cos(t_notch)-l_flat,OR_collar*sin(t_notch),0
+csys,1
+k,knum+7,OR_collar,t_notch,0
+
+! Nose
+k,knum+8,OR_collar,90,0
+k,knum+9,rin_collar,90,0
+
+! Extra Nose Match
+k,knum+10,rin_collar,y8,0
+
+! Lines
+csys,0
+l,knum+1,knum+2
+l,knum+2,knum+3
+l,knum+3,knum+4
+
+csys,1
+l,knum+4,knum+7
+
+csys,0
+l,knum+5,knum+6
+l,knum+6,knum+7
+l,knum+8,knum+9
+
+csys,1
+l,knum+5,knum+8
+l,knum+9,knum+10
+l,knum+10,knum+1
+
+! Area
+al,all
+cm,collar_fil,area
+! ---------------------------------
+! - Holes
+asel,none
+cyl4,r_collar_hole_pos*cos(t_collar_hole),r_collar_hole_pos*sin(t_collar_hole),r_collar_hole
+cm,collar_hole,area
+agen,2,all, , , , ,dz_collar
+cmsel,u,collar_hole
+cm,collar_hole_dz,area
+
+! Boolean collar top
+cmsel,s,collar_hole
+cmsel,a,collar_top
+asba,collar_top,collar_hole,,delete,delete
+cm,collar_top,area
+
+! Boolean collar filler
+cmsel,s,collar_hole_dz
+cmsel,a,collar_fil
+asba,collar_fil,collar_hole_dz,,delete,delete
+cm,collar_fil,area
+! -------------------------------------
+! - Bottom lamination
+! -------------------------------------
+! Init
+/inp,grab_nums,inp
+
+! Keypoints
+csys,1
+k,knum+1,rin_collar,0,dz_collar
+k,knum+2,OR_collar,0,dz_collar
+k,knum+3,OR_collar,t_end,dz_collar
+
+csys,0
+k,knum+4,rin_collar,OR_collar*sin(t_end),dz_collar
+
+! Lines
+csys,0
+l,knum+1,knum+2
+l,knum+3,knum+4
+l,knum+4,knum+1
+
+csys,1
+l,knum+2,knum+3
+
+! Area
+al,all
+cm,collar_bot,area
+! ---------------------------------
+! - Key Slots
+/inp,grab_nums,inp
+
+! Key - Top
+rectng,x_ckey,x_ckey+w_ckey,y_ckey,y_ckey+h_ckey
+cm,ckey,area
+agen,2,all, , , , ,dz_collar
+cmsel,u,ckey
+cm,ckey_dz,area
+
+! Cut Top Collar
+cmsel,s,collar_top
+cmsel,a,ckey
+asba,collar_top,ckey,,delete,keep
+cmsel,u,ckey
+cm,collar_top,area
+
+! Cut Bottom Collar
+cmsel,s,collar_bot
+cmsel,a,ckey_dz
+asba,collar_bot,ckey_dz,,delete,delete
+cm,collar_bot,area
+
+! Separate Key
+cmsel,s,ckey
+alls,below,area
+agen,2,all
+cm,atmp,area
+cmsel,u,ckey
+cm,ckey,area
+cmsel,s,atmp
+cmsel,u,ckey
+adele,all, , , 1
+! ---------------------------------
+! - Volumes
+! ---------------------------------
+! Extrude collar top straight
+vsel,none
+cmsel,s,collar_top
+vext,all, , , , ,length-end_length
+vatt,mat_ss_h
+cm,collar_top,volu
+
+! Merge with nose
+cmsel,a,collar_nose_top
+alls,below,volu
+nummrg,kp,1e-6
+
+! Extrude collar top end
+cmsel,s,collar_top
+alls,below,volu
+asel,r,loc,z,length-end_length
+vext,all, , , , , end_length
+vatt,mat_ss_h
+cmsel,a,collar_top
+cm,collar_top,volu
+vsweep,all
+
+! Extrude collar fil straight
+vsel,none
+cmsel,s,collar_fil
+vext,all, , , , ,length-end_length
+vatt,mat_ss_h
+cm,collar_fil,volu
+
+! Merge with nose
+cmsel,a,collar_nose_fil
+alls,below,volu
+nummrg,kp,1e-6
+
+! Extrude collar fil end
+cmsel,s,collar_fil
+alls,below,volu
+asel,r,loc,z,length-end_length
+vext,all, , , , , end_length
+vatt,mat_ss_h
+cmsel,a,collar_fil
+cm,collar_fil,volu
+vsweep,all
+
+! Extrude key
+cmsel,s,ckey
+vext,all, , , , ,length-end_length
+asel,r,loc,z,length-end_length
+vext,all, , , , , end_length
+vatt,mat_ss
+vsweep,all
+cm,ckey,volu
+! ------------------------------------------
+alls
+vplot
+/eof
+! ------------------------------------------
+/prep7
+csys,0
+cmsel,s,pole1
+alls,below,volu
+asel,r,loc,z,0
+agen,2,all, , , , , , , , 0
+aslv,u
+cm,acs_pole1,area
+
+csys,0
+cmsel,s,pole2
+alls,below,volu
+asel,r,loc,z,0
+agen,2,all, , , , , , , , 0
+aslv,u
+cm,acs_pole2,area
+
+cmsel,s,acs_pole1
+cmsel,a,acs_pole2
+aplot
+
+! Now add interlay area
+csys,1
+cmsel,s,acs_pole1
+alls,below,area
+lsel,r,loc,x,r12
+cm,l1,line
+ksll
+ksel,r,loc,y,89,91
+*get,k1,kp,,num,min
+ksll
+ksel,u,loc,y,89,91
+*get,k2,kp,,num,min
+*get,ymin,kp,,mnloc,y
+k,,r21,ymin,0
+k3 = _return
+
+cmsel,s,acs_pole2
+alls,below,area
+lsel,r,loc,x,r21
+cm,l3,line
+ksll
+ksel,r,loc,y,89,91
+*get,k4,kp,,num,min
+
+! Create Lines
+lsel,none
+cmsel,a,l1
+ksel,a,kp,,k1
+ksel,a,kp,,k2
+ksel,a,kp,,k3
+ksel,a,kp,,k4
+
+csys,0
+l,k1,k4
+l,k2,k3
+
+csys,1
+l,k3,k4
+
+lplot
+al,all
+cm,ajoint,area
+
+cmsel,a,acs_pole1
+cmsel,a,acs_pole2
+alls,below,area
+aplot
+
+btol,1e-4
+aadd,all
+
+csys,0
+vsel,none
+vext,all, , , , ,length-end_length
+cm,collar_nose,volu
+vatt,mat_ss
+
+! Remove old volume
+cmsel,s,pole1
+cmsel,a,pole2
+alls,below,volu
+asel,r,loc,z,0
+vsla,r
+alls,below,volu
+vclear,all
+vdele,all, , , 1
+
+
+alls
+vplot
+/eof
+! Select poles straight section
+csys,0
+cmsel,s,pole1
+cmsel,a,pole2
+asel,r,loc,z,0
+vsla,r
+cm,pole_str,volu
+alls,below,volu
+
+! Select only cs area
+cmsel,s,pole1
+cmsel,r,pole_str
+asel,r,loc,z,0
+/eof
+agen,2,all, , , , , , , , 1
+aslv,u
+
+vclear,all
+vplot
+
+! Interlayer Joint
+! ------ Inner Area
+! Get Pole1 Area
+csys,1
+cmsel,s,pole_str
+alls,below,volu
+asel,r,loc,x,r12
+*get,apole1,area,,num,min
+
+! Try extrusion
+vsel,none
+vext,all, , , r21-r12
+cm,cjoint,volu
+cmsel,a,pole_str
+cm,pole_str,volu
+
+alls,below,volu
+vplot
+! ! Get Pole1 Lines
+! alls,below,area
+! csys,0
+! lsel,u,loc,x,-1e-4,1e-4
+! lsel,u,loc,z,0
+! cm,lpole1,line
+/eof
+! Get keypoints
+csys,1
+alls,below,volu
+ksel,r,loc,x,r12
+ksel,r,loc,z,0
+ksel,u,loc,y,89,91
+*get,
+*get,kp_p1_1,kp,,num,min
+ksll
+ksel,r,loc,x,0
+*get,kp_p1_2,kp,,num,min

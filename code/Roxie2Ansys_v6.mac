@@ -1,0 +1,883 @@
+! -------------------------------------
+! Roxie 2 Ansys - Will be a macro
+! G. Vallone, 11/2021
+! -------------------------------------
+! --- - Guide
+! Roxie input should have negative mid plane shim (first angle <0)
+! Sometimes changing the boolean tolerance can help
+! Need to input the correct radiuses below, might be an argument in future versions
+! But probably would be better to separate in multiple macros
+! Precision of the algorithm is ~10 um, don't try to define blocks closer than that...
+! -------------------------------------
+! --- - NOTES
+! Should fix the bspline slope
+! Can do fixing a csys in the last point and getting the coordinates of the new point
+! Should do as slope for beginning and last point
+
+! Requires no mid-plane shim - move the surface if necessary
+! ANway it is not good for the model to have a very thin layer
+! with distorted elements
+
+! Notice that visually might look wrong because of l_extend
+! It creates a non uniform out of plane component, which depends
+! on the inclination of the generative lines
+
+! --------- CALLING LINE ---------- !
+! *use,Roxie2Ansys_v3.mac,file_name,file_ext,l_extend,coil_length,mid_plane_shim
+
+! Load parameters
+file_name 		= arg1
+file_ext 		= arg2
+l_extend 		= arg3
+coil_length 	= arg4
+mid_plane_shim 	= arg5
+mesh_size 		= arg6
+
+! ------------------------------------------------------
+! Set environment
+/UNITS,SI
+pi = acos(-1)
+*afun,deg
+! ------------------------------------------------------
+! - Initialize - Find how many parts
+*sread,cnc_str,file_name,file_ext 	! Load all file in a str array
+*get,Lstr,PARM,cnc_str,dim,1
+*get,Nlines,PARM,cnc_str,dim,2
+
+! Get the number of edges
+check_str = 'WEDGE'
+Nedges = 0
+Nparts = 0
+
+*do,ll,1,Nlines
+	str_ll = STRSUB(cnc_str(1,ll),4,6)
+	*if,str_ll,eq,check_str,then 	! Check if it is a wedge line
+		Nedges = Nedges + 1
+		wedge_ww = strsub(cnc_str(1,ll),9,5)
+		wedge_ww = VALCHR(wedge_ww) 	! Wedge number
+		
+		*if,wedge_ww,gt,Nparts,then
+			Nparts = wedge_ww
+		*endif
+
+	*endif
+*enddo
+
+! ------------------------------------------------------
+! - Initialize Edge Reader
+*dim,V_WSpec,char,6 		! Block title text vector
+*dim,V_edges,char,Nedges,3 	! Store edge info
+! ------------------------------------------------------
+! - Cycle over blocks
+row = 0
+*do,bb,1,Nedges
+
+! Read Block Title
+row = row + 1
+*vread,V_WSpec(1),file_name,file_ext, , , , , , row
+(3x,A5,2x,A3,x,A5,2x,A7,x,A1,11x,A3)
+
+part_name 		= V_WSpec(1)
+part_number 	= VALCHR(V_WSpec(2)) 	! Converted to float
+part_surface 	= V_WSpec(3)
+part_edge_tp	= V_WSpec(4) 			! Might be useful for warnings / not sure
+part_edge_n 	= VALCHR(V_WSpec(5))
+Npoints 		= VALCHR(V_WSpec(6))
+
+part_surface_id = STRSUB(part_surface,1,2)
+
+! Store for later calling
+V_edges(bb,1) = V_WSpec(2)
+V_edges(bb,2) = STRSUB(part_surface,1,2)
+V_edges(bb,3) = V_WSpec(5)
+
+! Jump empty + label line
+row = row + 1
+row = row + 1
+
+! Cycle over points
+vstr = 'V_Pnts_%part_number%_%part_surface_id%_%part_edge_n%'
+
+*dim,%vstr%,array,3,Npoints
+
+*do,pp,1,Npoints
+row = row + 1
+*vread,%vstr%(1,pp),file_name,file_ext, , , , , , row
+(3x,3F8.3)
+! (3x,3F14.8)
+*enddo 	! Point cycle
+row = row + 1
+
+*enddo 	! Block Cycle
+
+! ------------------------------------------------------
+! - Manipulate to get coincident sharp edges
+! Flag endspacers, checking in the cross-section
+! if the in and out spacer surfaces are close
+Nspacers = 0
+sptol = 1
+*dim,vflag,array,Nparts
+*do,pp,1,Nparts
+	vstr_in = 'V_Pnts_%pp%_in_%1%'
+	vstr_ou = 'V_Pnts_%pp%_ou_%1%'
+
+	*get,in_type,PARM,%vstr_in%,TYPE
+	*get,ou_type,PARM,%vstr_ou%,TYPE
+
+	*if,in_type,eq,ou_type,then
+		xin = %vstr_in(1,1)%
+		yin = %vstr_in(1,1)%
+
+		xou = %vstr_ou(1,1)%
+		you = %vstr_ou(1,1)%
+
+		*if,xin,gt,xou-sptol,then
+		*if,xin,lt,xou+sptol,then
+			*if,yin,gt,you-sptol,then
+			*if,yin,lt,you+sptol,then
+				Nspacers = Nspacers+1
+				vflag(pp) = 1
+			*endif
+			*endif
+		*endif
+		*endif
+	*endif
+*enddo
+
+! ------------------- Works up to here, flagging endspacers correctly
+! Fix endspacers
+! fixed = 0
+! check = 0
+
+*do,pp,1,Nparts
+	*if,vflag(pp),eq,1,then
+
+! pp = 8
+
+		vstr_in = 'V_Pnts_%pp%_in_%1%'
+		vstr_ou = 'V_Pnts_%pp%_ou_%1%'
+
+		z2in = %vstr_in(3,2)%
+		z2ou = %vstr_ou(3,2)%
+
+		*get,Npoints_in,parm,%vstr_in%,dim,Y
+		*get,Npoints_ou,parm,%vstr_ou%,dim,Y
+
+		! Remove excess lines - case A - No cases with the opposite for the moment
+		! Should add just in case z2ou<z2in
+		*if,z2in,lt,z2ou,then
+			check = 1
+		! *else
+! 			! *msg,warn,'Z2OUT<Z2IN NOT HANDLED'
+		*endif
+
+! 		*MSG, ERROR, 'FLAG TEST'
+
+		! find points on the inner surface that are with z< than second point on the inner surface
+		! z2out = %vstr_ou(3,2)%
+		! pcount = 0
+		! *get,Npoints_in,parm,%vstr_in%,dim,Y
+		! *do,ii,2,Npoints_in
+		! 	z_pp_in = %vstr_in(3,ii)%
+		! 	*if,z_pp_in,lt,z2out,then
+		! 		pcount = pcount+1
+		! 	*endif
+		! *enddo
+
+		! JUST FIXING ONE POINT NOW
+		! if check = 1
+		! need to check if we are the same or not on the z to keep check = 1
+
+		! Find the number of points in the outer surface
+		*get,Npoints_ou,parm,%vstr_ou%,dim,Y
+
+		*dim,ptmp_ou_1,array,3,Npoints_ou+1
+		*dim,ptmp_ou_2,array,3,Npoints_ou+1
+
+		! Copy first and second point from inner
+		vstr_in_1 = 'V_Pnts_%pp%_in_%1%'
+		vstr_in_2 = 'V_Pnts_%pp%_in_%2%'
+		vstr_ou_1 = 'V_Pnts_%pp%_ou_%1%'
+		vstr_ou_2 = 'V_Pnts_%pp%_ou_%2%'
+
+		*do,ii,1,2
+			ptmp_ou_1(1,ii) = %vstr_in_1%(1,ii)
+			ptmp_ou_1(2,ii) = %vstr_in_1%(2,ii)
+			ptmp_ou_1(3,ii) = %vstr_in_1%(3,ii)
+			ptmp_ou_2(1,ii) = %vstr_in_2%(1,ii)
+			ptmp_ou_2(2,ii) = %vstr_in_2%(2,ii)
+			ptmp_ou_2(3,ii) = %vstr_in_2%(3,ii)
+		*enddo
+
+		! Copy rest of the points
+		*do,ii,3,Npoints_ou+1
+			ptmp_ou_1(1,ii) = %vstr_ou_1%(1,ii-1)
+			ptmp_ou_1(2,ii) = %vstr_ou_1%(2,ii-1)
+			ptmp_ou_1(3,ii) = %vstr_ou_1%(3,ii-1)
+			ptmp_ou_2(1,ii) = %vstr_ou_2%(1,ii-1)
+			ptmp_ou_2(2,ii) = %vstr_ou_2%(2,ii-1)
+			ptmp_ou_2(3,ii) = %vstr_ou_2%(3,ii-1)
+		*enddo
+
+		! Transfer back to vstr vector
+		*del,%vstr_ou_1%
+		*del,%vstr_ou_2%
+		*dim,%vstr_ou_1%,array,3,Npoints_ou+1
+		*dim,%vstr_ou_2%,array,3,Npoints_ou+1
+		*do,ii,1,Npoints_ou+1
+			%vstr_ou_1%(1,ii) = ptmp_ou_1(1,ii)
+			%vstr_ou_1%(2,ii) = ptmp_ou_1(2,ii)
+			%vstr_ou_1%(3,ii) = ptmp_ou_1(3,ii)
+			%vstr_ou_2%(1,ii) = ptmp_ou_2(1,ii)
+			%vstr_ou_2%(2,ii) = ptmp_ou_2(2,ii)
+			%vstr_ou_2%(3,ii) = ptmp_ou_2(3,ii)
+		*enddo
+		*del,ptmp_ou_1
+		*del,ptmp_ou_2
+
+	*endif
+*enddo
+
+! ------------------------------------------------------
+! - Create Surfaces
+/prep7
+! Start with the second block, easier
+! Keypoints
+
+! Cycle over parts
+ee = 0
+*do,ss,1,Nedges/2
+! ss = 19
+	ee = ee + 1 ! Edge number
+	part_number = VALCHR(V_edges(ee,1))
+	part_surface_id = V_edges(ee,2)
+	part_edge_n = VALCHR(V_edges(ee,3))
+	vstr = 'V_Pnts_%part_number%_%part_surface_id%_%part_edge_n%'
+
+	alls
+	*get,k0,kp,,num,max
+	k_in = k0 + 1
+	numstr,kp,k0
+
+	*get,Npoints,parm,%vstr%,dim,Y
+
+	*do,pp,1,Npoints
+		! xp = NINT(%vstr(1,pp)%*100)/100	! Have to round, roxie is not precise
+		! yp = NINT(%vstr(2,pp)%*100)/100
+		! zp = NINT(%vstr(3,pp)%*100)/100
+		xp = %vstr(1,pp)%
+		yp = %vstr(2,pp)%
+		zp = %vstr(3,pp)%
+
+
+		! Move a bit for mid-plane boolean
+		! *if,yp,lt,mid_plane_shim,then
+		! 	! *if,zp,lt,-l_extend,then
+		! 		yfix = yp - l_extend - 1
+		! 		%vstr%(2,pp) = yfix
+		! 		yp = yfix
+		! 	! *endif
+		! *endif
+
+		k, , xp, yp, zp
+	*enddo
+
+	! - Outer Edge
+	ee = ee + 1 ! Edge number
+	part_number = VALCHR(V_edges(ee,1))
+	part_surface_id = V_edges(ee,2)
+	part_edge_n = VALCHR(V_edges(ee,3))
+	vstr = 'V_Pnts_%part_number%_%part_surface_id%_%part_edge_n%'
+
+	alls
+	*get,k0,kp,,num,max
+	k_ou = k0 + 1
+	numstr,kp,k0
+
+	*get,Npoints,parm,%vstr%,dim,Y
+
+	*do,pp,1,Npoints		
+		xp = %vstr(1,pp)%
+		yp = %vstr(2,pp)%
+		zp = %vstr(3,pp)%
+
+		! Move a bit for mid-plane boolean
+		! *if,yp,lt,mid_plane_shim,then
+		! 	! *if,zp,lt,-l_extend,then
+		! 		yfix = yp - l_extend - 1
+		! 		%vstr%(2,pp) = yfix
+		! 		yp = yfix
+		! 	! *endif
+		! *endif
+
+		k, , xp, yp, zp
+
+	*enddo
+
+*enddo
+
+! Merge nearby nodes
+alls
+! ksel,r,loc,z,0
+/pnum,kp,1
+kplot
+
+! -----------
+! MERGE KEYPOINTS TO AVOID WEIRD VOLUMES - They have the same coordinates
+! Fixed before
+! nummrg,kp,1e-2
+nummrg,kp,1e-3
+
+! ------------------
+alls
+ksel,r,loc,z,0
+/pnum,kp,1
+kplot
+! ------------------
+! Get New Keypoint Names
+ee = 0
+*do,ss,1,Nedges/2
+	ee = ee + 1 ! Edge number
+	part_number = VALCHR(V_edges(ee,1))
+	part_surface_id = V_edges(ee,2)
+	part_edge_n = VALCHR(V_edges(ee,3))
+	vstr_in = 'V_Pnts_%part_number%_%part_surface_id%_%part_edge_n%'
+
+	ee = ee + 1 ! Edge number
+	part_number = VALCHR(V_edges(ee,1))
+	part_surface_id = V_edges(ee,2)
+	part_edge_n = VALCHR(V_edges(ee,3))
+	vstr_ou = 'V_Pnts_%part_number%_%part_surface_id%_%part_edge_n%'
+
+	*get,Npoints%ss%,parm,%vstr_in%,dim,Y
+
+	lsel,none
+
+	*dim,kspline_%ss%_in,array,Npoints%ss%
+	*dim,kspline_%ss%_ou,array,Npoints%ss%
+	
+	*do,pp,1,Npoints%ss%
+		ksel,all
+
+		! Select first keypoint
+		xp = NINT(%vstr_in(1,pp)%*100)/100
+		yp = NINT(%vstr_in(2,pp)%*100)/100
+		zp = NINT(%vstr_in(3,pp)%*100)/100
+		
+		kspline_%ss%_in(pp) = kp(xp,yp,zp)
+
+		! Select second keypoint
+		xp = NINT(%vstr_ou(1,pp)%*100)/100
+		yp = NINT(%vstr_ou(2,pp)%*100)/100
+		zp = NINT(%vstr_ou(3,pp)%*100)/100
+		
+		kspline_%ss%_ou(pp) = kp(xp,yp,zp)
+	*enddo
+*enddo
+
+! -----------------------------------------------------
+! Create Surface Lines
+*do,ss,1,Nedges/2
+	alls
+	Npoints = Npoints%ss%
+
+	*do,pp,1,Npoints
+		! l,k%pp%_%ss%in,k%pp%_%ss%ou
+		l,kspline_%ss%_in(pp),kspline_%ss%_ou(pp) 
+	*enddo
+	cm,surf_lines_%ss%,line
+*enddo
+alls
+lplot
+
+! Extend Surface Lines
+*get,Nkp,kp,,count
+kpi = 0
+*do,kk,1,Nkp
+	ksel,all
+	*get,kpi,kp,kpi,nxth
+	ksel,s,kp,,kpi
+	lslk,s
+	*get,ltmp,line,,num,min
+	lext,ltmp,kpi,l_extend,0
+*enddo
+alls
+lplot
+
+! ------------------------------------------------
+! Create BSplines - With Macro
+alls
+*do,ss,1,Nedges/2
+	alls
+
+	! Inside Lines
+	create_spline_v3,Npoints%ss%,'kspline_%ss%_in'
+	lspline_in = lspline
+	lstr_in = lstr	
+	cmsel,s,line_seg
+	cm,line_seg_in,line
+	lsel,s,line,,lspline_in
+	lsel,a,line,,lstr_in
+	cm,line_in,line
+
+	! Outside Lines
+	create_spline_v3,Npoints%ss%,'kspline_%ss%_ou'	
+	lspline_ou = lspline
+	lstr_ou = lstr	
+	cmsel,s,line_seg
+	cm,line_seg_ou,line
+	lsel,s,line,,lspline_ou
+	lsel,a,line,,lstr_ou
+	cm,line_ou,line
+
+	! Remove extra lines
+	alls
+	cmsel,s,surf_lines_%ss%
+	cmsel,a,line_seg_in
+	cmsel,a,line_seg_ou
+	cmsel,u,line_in
+	cmsel,u,line_ou
+	ldele,all, , , 1
+
+	alls
+	lplot
+
+	! Add end lines, to close surfaces
+	cmsel,s,line_in
+	cmsel,a,line_ou
+
+	l,kspline_%ss%_in(1),kspline_%ss%_ou(1)
+	line_z0 = _return
+	l,kspline_%ss%_in(Npoints),kspline_%ss%_ou(Npoints)	
+	line_end = _return
+	l,kspline_%ss%_in(2),kspline_%ss%_ou(2)	
+	line_centre = _return
+	ksll,s,1
+	lslk,a,1
+	cm,edge_lines_%ss%,line
+
+	! lsel,r,loc,z,0
+	! *get,line_z0,line,,num,min
+
+	! Generate surfaces
+	lsel,s,line,,lstr_in
+	lsel,a,line,,lstr_ou
+	lsel,a,line,,line_z0
+	lsel,a,line,,line_centre
+	al,all
+	a%ss%_str = _return
+
+	cmsel,s,edge_lines_%ss%
+	lsel,u,line,,lstr_in
+	lsel,u,line,,lstr_ou
+	lsel,u,line,,line_z0
+	al,all
+	a%ss%_end = _return
+
+*enddo
+
+alls
+/pnum,area,1
+aplot
+
+alls
+cm,area_cut,area
+! ---------------------------------------------
+! ---- Will it bool?
+! Improving the continuity of slopes should
+! facilitate the booleans
+csys,1
+numstr,kp,1
+numstr,line,1
+numstr,area,1
+numstr,volu,1
+csys,1
+
+*set,r11,  	60.0
+*set,r12,	r11+15.4
+*set,r21,	76.1
+*set,r22,	r21+15.4
+
+! Separate inner/outer cut areas
+cmsel,s,area_cut
+alls,below,area
+csys,1
+ksel,r,loc,x,r22-l_extend,r22+l_extend
+lslk,r
+! ---------------------------------------------
+! - Mod for robustness / should not be needed
+asll,r
+alls,below,area
+asll,s
+! ---------------------------------------------
+cm,area_cut_ou,area
+cmsel,s,area_cut
+cmsel,u,area_cut_ou
+cm,area_cut_in,area
+
+! Inner Volume
+vsel,none
+rin = r11
+rou = r12
+
+k,,rin,0
+k1 = _return
+k,,rou,0
+k2 = _return
+k,,rou,90
+k3 = _return
+k,,rin,90
+k4 = _return
+
+l,k1,k2
+l,k2,k3
+l,k3,k4
+l,k4,k1
+
+a,k1,k2,k3,k4
+a1 = _return
+csys,0
+vext,a1, , , , , coil_length
+cm,v_in,volu
+
+! Outer Volume
+csys,1
+vsel,none
+rin = r21
+rou = r22
+
+k,,rin,0
+k1 = _return
+k,,rou,0
+k2 = _return
+k,,rou,90
+k3 = _return
+k,,rin,90
+k4 = _return
+
+l,k1,k2
+l,k2,k3
+l,k3,k4
+l,k4,k1
+
+a,k1,k2,k3,k4
+a1 = _return
+csys,0
+vext,a1, , , , , coil_length
+cm,v_ou,volu
+
+! BOOLEAN
+alls
+/pnum,volu,1
+vplot
+
+csys,0
+
+btol,1e-3
+cmsel,s,v_ou
+alls,below,volu
+cmsel,a,area_cut_ou
+vsba,all,area_cut_ou
+cm,layer2,volu
+cm,outer_layer,volu
+
+cmsel,s,v_in
+alls,below,volu
+cmsel,a,area_cut_in
+vsba,all,area_cut_in
+cm,layer1,volu
+cm,inner_layer,volu
+btol,
+
+/pnum,volu,1
+alls
+vplot
+
+! Delete unused
+alls
+cmsel,u,inner_layer
+cmsel,u,outer_layer
+vdele,all, , , 1
+
+alls
+/pnum,volu,1
+vplot
+
+save,geo,db
+
+! Names - Inner Layer
+*do,ll,1,2
+! ll = 1
+	cmsel,s,layer%ll%
+	alls,below,volu
+	csys,1
+	asel,r,loc,y,90-1e-6,90+1e-6
+	*get,anum,area,,count
+	cm,atmp_cm,area
+
+	skippo = 1 	! Starting with pole
+	cc = 0
+	ww = 0
+	*do,aa,1,anum
+		cmsel,s,atmp_cm
+		alls,below,area
+		ksel,r,loc,x,r%ll%1
+		*get,zmin,kp,,mnloc,z
+		ksel,r,loc,z,zmin-1e-6,zmin+1e-6
+		lslk,r
+		asll,r
+		*get,atmp,area,,num,min
+		vsla,s
+		*if,skippo,eq,0,then
+			cc = cc + 1
+			cm,coil%ll%%cc%,volu
+			skippo = 1
+		*elseif,skippo,eq,1,then
+			ww = ww + 1
+			cm,wedge%ll%%ww-1%,volu
+			skippo = 0
+		*endif
+		! Update cm
+		cmsel,s,atmp_cm
+		asel,u,area,,atmp
+		cm,atmp_cm,area
+	*enddo
+
+	! Pole
+	cmsel,s,wedge%ll%0
+	cm,pole%ll%,volu
+	cmdele,wedge%ll%0
+
+	! Endshoe
+	cmsel,s,wedge%ll%%ww-1%
+	cm,endshoe%ll%,volu
+	cmdele,wedge%ll%%ww%
+
+	! Global Names
+	vsel,none
+	*do,ii,1,cc
+		cmsel,a,coil%ll%%ii%
+	*enddo
+	cm,coil%ll%,volu
+	Nc%ll% = cc
+
+	vsel,none
+	*do,ii,1,ww-2
+		cmsel,a,wedge%ll%%ii%
+	*enddo
+	cm,wedge%ll%,volu
+	Nw%ll% = ww-2
+
+	! Endspacers
+	cmsel,s,layer%ll%
+	cmsel,u,endshoe%ll%
+	alls,below,volu
+	asel,r,loc,z,0
+	vsla,u
+	alls,below,volu
+	asel,r,loc,y,90
+	*get,anum,area,,count
+	cm,atmp_cm,area
+
+	es = 0
+	*do,aa,1,anum
+		cmsel,s,atmp_cm
+		alls,below,area
+		ksel,r,loc,x,r%ll%1
+		*get,zmin,kp,,mnloc,z
+		ksel,r,loc,z,zmin
+		lslk,r
+		asll,r
+		*get,atmp,area,,num,min
+		vsla,s
+		es = es + 1
+		cm,endspacer%ll%%es%,volu
+
+		! Update cm
+		cmsel,s,atmp_cm
+		asel,u,area,,atmp
+		cm,atmp_cm,area
+	*enddo
+
+	vsel,none		
+	*do,ii,1,es
+		cmsel,a,endspacer%ll%%ii%
+	*enddo
+	cm,endspacer%ll%,volu
+
+*enddo
+
+! - Global Names
+cmsel,s,coil1
+cmsel,a,coil2
+cm,coil,volu
+
+cmsel,s,wedge1
+cmsel,a,wedge2
+cmsel,u,endspacer1
+cmsel,u,endspacer2
+cm,wedge,volu
+
+cmsel,s,pole1
+cmsel,a,pole2
+cm,pole,volu
+
+cmsel,s,endspacer1
+cmsel,a,endspacer2
+cm,endspacer,volu
+
+cmsel,s,endshoe1
+cmsel,a,endshoe2
+cm,endshoe,volu
+
+! --- END END END
+! - Try a mesh
+et,1,solid186
+r,1
+
+et,5,mesh200
+keyopt,5,1,7
+r,5
+
+alls
+type,1
+esize,mesh_size
+
+! Mesh coil
+/inp,Mag_mat,inp
+
+mshkey,2
+
+cmsel,s,coil
+alls,below,volu
+vatt,mat_coil
+vsweep,all
+
+cmsel,s,wedge
+alls,below,volu
+vatt,mat_albr
+vsweep,all
+
+cmsel,s,pole
+alls,below,volu
+vatt,mat_albr
+vsweep,all
+
+cmsel,s,endshoe
+alls,below,volu
+vatt,mat_ss
+vsweep,all
+
+cmsel,s,endspacer
+alls,below,volu
+*get,Nv,volume,,count
+
+*if,Nv,gt,0,then  	! Need to check if there are endspacers...
+	csys,1
+	asel,r,loc,x,r22
+	alls,below,area
+	lesize,all,mesh_size
+	type,5
+	amesh,all
+	type,1
+	vatt,mat_albr
+	vsweep,all
+	aclear,all
+*endif
+
+! Missing volumes
+alls
+type,1
+mshape,1
+mshkey,0
+vmesh,all
+mshape,2
+mshkey,2
+
+alls
+/view,,1,1,1
+/pnum,mat,1
+/number,1
+eplot
+
+! - Test - Separate the meshes
+! cmsel,s,pole1
+! alls,below,volu
+! vgen,2,all
+
+! Extrude
+*if,L_extr,gt,0,then
+L_extr = 300
+Nlayer = 2
+
+*do,ll,1,Nlayer
+	*do,cc,1,Nc%ll%
+		cmsel,s,coil%ll%%cc%
+		alls,below,volu
+		asel,r,loc,z,0
+		*get,cura,area,,num,min
+		vext,cura,,,0,0,-L_extr
+		vsweep,all
+		vatt,mat_coil
+		cm,coil%ll%%cc%,volu
+	*enddo
+
+	*do,ww,1,Nw%ll%
+		cmsel,s,wedge%ll%%ww%
+		alls,below,volu
+		asel,r,loc,z,0
+		*get,cura,area,,num,min
+		vext,cura,,,0,0,-L_extr
+		vatt,mat_albr
+		vsweep,all
+		cm,wedge%ll%%cc%,volu
+	*enddo
+
+	cmsel,s,pole%ll%
+	alls,below,volu
+	asel,r,loc,z,0
+	*get,cura,area,,num,min
+	vext,cura,,,0,0,-L_extr
+	vatt,mat_albr
+	vsweep,all
+	cm,pole%ll%%cc%,volu
+
+	! Names
+	vsel,none
+	*do,cc,1,Nc%ll%
+		cmsel,a,coil%ll%%cc%
+	*enddo
+	cm,coil%ll%,volu
+
+	vsel,none
+	*do,cc,1,Nw%ll%
+		cmsel,a,wedge%ll%%cc%
+	*enddo
+	cm,wedge%ll%,volu
+	
+*enddo
+
+cmsel,s,coil1
+cmsel,a,coil2
+cm,coil,volu
+
+cmsel,s,wedge1
+cmsel,a,wedge2
+cm,wedge,volu
+
+alls
+/view,,1,1,1
+eplot
+
+! Move
+alls
+vgen,2,all,,,,,L_extr,,,1
+eplot
+
+*endif
+
+! - Remove parameters
+/output,empty,dat
+/output
+parres,,empty,dat
+! ------------------------------------------------------

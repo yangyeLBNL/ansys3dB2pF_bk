@@ -1,0 +1,230 @@
+! ------------------------------------------
+! - Fillers considering nose geo
+resume,B2pF_3D,db
+/prep7
+/inp,grab_nums,inp
+! ------------------------------------------
+! Get Pole Shapes
+csys,1
+
+cmsel,s,coil1
+alls,below,volu
+asel,r,loc,z,0
+alls,below,area
+ksel,r,loc,x,r12
+*get,y3,kp,,mxloc,y
+
+cmsel,s,coil2
+alls,below,volu
+asel,r,loc,z,0
+alls,below,area
+ksel,r,loc,x,r22
+*get,y8,kp,,mxloc,y
+! ------------------------------------------
+! - Interlayer
+vsel,none
+asel,none
+lsel,none
+
+! Straight Section
+rin = r12
+rou = r21
+
+csys,1
+k,knum+1,rin,0,0
+k,knum+2,rou,0,0
+k,knum+3,rou,y3,0
+k,knum+4,rin,y3,0
+
+csys,0
+l,knum+1,knum+2
+l,knum+3,knum+4
+
+csys,1
+l,knum+2,knum+3
+l,knum+4,knum+1
+
+al,all
+a1 = _return
+
+vext,a1, , , , , coil_length-end_length
+cm,interlay,volu
+vatt,mat_g10
+
+! End Part 1
+alls,below,volu
+asel,r,loc,z,coil_length-end_length
+vext,all, , , , , end_length + t_endspacers
+vatt,mat_g10
+cm,interlay,volu
+
+alls,below,volu
+
+! CS Part 2
+/inp,grab_nums,inp
+vsel,none
+asel,none
+lsel,none
+
+csys,1
+k,knum+1,rin,y3,coil_length-end_length
+k,knum+2,rou,y3,coil_length-end_length
+k,knum+3,rou,90,coil_length-end_length
+k,knum+4,rin,90,coil_length-end_length
+
+csys,0
+l,knum+1,knum+2
+l,knum+3,knum+4
+
+csys,1
+l,knum+2,knum+3
+l,knum+4,knum+1
+
+al,all
+a2 = _return
+
+vext,a2, , , , , end_length + t_endspacers
+vatt,mat_g10
+
+cmsel,a,interlay
+alls,below,volu
+nummrg,kp,1e-6
+cm,interlay,volu
+
+! Mesh
+vsweep,all
+! ------------------------------------------
+! - Filler
+/inp,grab_nums,inp
+vsel,none
+asel,none
+lsel,none
+
+! Straight Section
+rin = r22
+rou = r22+fillerth
+
+csys,1
+k,knum+1,rin,0,0
+k,knum+2,rou,0,0
+k,knum+3,rou,y8,0
+k,knum+4,rin,y8,0
+
+csys,0
+l,knum+1,knum+2
+l,knum+3,knum+4
+
+csys,1
+l,knum+2,knum+3
+l,knum+4,knum+1
+
+al,all
+a1 = _return
+
+vext,a1, , , , , coil_length-end_length
+cm,filler,volu
+vatt,mat_g10
+
+! End Part 1
+alls,below,volu
+asel,r,loc,z,coil_length-end_length
+vext,all, , , , , end_length + t_endspacers
+vatt,mat_g10
+cm,filler,volu
+
+
+! CS Part 2
+/inp,grab_nums,inp
+vsel,none
+asel,none
+lsel,none
+
+csys,1
+k,knum+1,rin,y8,coil_length-end_length
+k,knum+2,rou,y8,coil_length-end_length
+k,knum+3,rou,90,coil_length-end_length
+k,knum+4,rin,90,coil_length-end_length
+
+csys,0
+l,knum+1,knum+2
+l,knum+3,knum+4
+
+csys,1
+l,knum+2,knum+3
+l,knum+4,knum+1
+
+al,all
+a2 = _return
+
+vext,a2, , , , , end_length + t_endspacers
+vatt,mat_g10
+
+cmsel,a,filler
+alls,below,volu
+nummrg,kp,1e-6
+cm,filler,volu
+
+! Mesh
+vsweep,all
+! ------------------------------
+! End System
+/inp,grab_nums,inp
+vsel,none
+asel,none
+lsel,none
+
+csys,1
+k,knum+1,r11,90,length
+k,knum+2,r11,0 ,length
+csys,0
+k,knum+3,w_eplate,0       ,length
+k,knum+4,w_eplate,h_eplate,length
+k,knum+5,0       ,h_eplate,length
+
+
+csys,1
+l,knum+1,knum+2
+csys,0
+l,knum+2,knum+3
+l,knum+3,knum+4
+l,knum+4,knum+5
+l,knum+5,knum+1
+
+! fillet
+lfillt,lnum+3,lnum+4,rfillet_eplate
+
+al,all
+cm,eplate_area,area
+
+! holes
+asel,none
+wpoffs,0,0,length
+cyl4,r_rod*cos(t_rod),r_rod*sin(t_rod),d_rod*0.5+1e-3
+cm,eplate_hole,area
+
+! remove the holes
+cmsel,s,eplate_area
+cmsel,a,eplate_hole
+asba,eplate_area,eplate_hole,,delete,delete
+cm,eplate_area,area
+
+! fine mesh at the holes
+cmsel,s,eplate_area
+allsel,below,area
+lsel,u,loc,x,0
+lsel,u,loc,y,0
+lsel,u,loc,x,w_eplate
+lsel,u,loc,y,h_eplate
+csys,1
+lsel,u,loc,x,r11
+lesize,all,mesh_size*0.5
+csys,0
+
+vext,all, , , , , teplate
+cm,eplate,volu
+vatt,mat_ss
+esize,mesh_size
+vsweep,all
+
+wpoffs,0,0,-length
+! ------------------------------

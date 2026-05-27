@@ -1,0 +1,28 @@
+! *use,spline_slope_macro.mac,kstart,kend,kbefore,kafter
+
+kstart 		= arg1
+kend 		= arg2
+kbefore 	= arg3
+kafter 		= arg4
+
+csys,0
+*get,xk1,kp,kstart,loc,x
+*get,yk1,kp,kstart,loc,y
+*get,zk1,kp,kstart,loc,z
+local,11,0,xk1,yk1,zk1
+csys,11
+*get,xv1,kp,kbefore,loc,x
+*get,yv1,kp,kbefore,loc,y
+*get,zv1,kp,kbefore,loc,z
+
+csys,0
+*get,xk6,kp,kend,loc,x
+*get,yk6,kp,kend,loc,y
+*get,zk6,kp,kend,loc,z
+local,16,0,xk6,yk6,zk6
+csys,16
+*get,xv6,kp,kafter,loc,x
+*get,yv6,kp,kafter,loc,y
+*get,zv6,kp,kafter,loc,z
+
+csys,0

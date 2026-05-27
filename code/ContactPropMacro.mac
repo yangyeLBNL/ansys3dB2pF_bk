@@ -1,0 +1,36 @@
+! Contact Prop Def Macro
+
+! Usage Example:
+! ContactPropMacro,10,'conta172',0,3,1e-6,0e-6,125,'targe169'
+
+! Parameters
+! arg1 = Contact Element Number
+! arg2 = Contact Element Name
+! arg3 = Keyopt 12 Value
+! arg4 = Keyopt 9 Value
+! arg5 = Friction Coefficient Value
+! arg6 = Real Constant 10 Value
+! arg7 = Target Element Number
+! arg8 = Target Element Type
+
+et,arg1,arg2					! Create the element
+keyopt,arg1,12,arg3				! Contact type
+keyopt,arg1,9,arg4				! Adjustment type
+mp,mu,arg1,arg5					! Friction coefficient
+r,arg1
+RMORE,,,,arg6, ,				! R10 Value
+et,arg7,arg8					! Target Element
+
+! keyopt,arg1,10,1 ! Fix for ANSYS18
+
+! New Options to Improve Conv. Speed
+keyopt,arg1,10,0 ! Fast update of FKN
+! r,arg1, , , ,.5e-2 ! Penetration Tolerance Multiplier
+! r,arg1, , , 4,1e-2 ! Penetration Tolerance Multiplier
+! keyopt,arg1,2,4
+
+! *if,arg3,eq,5,then
+! 	r,arg1, , , 10,1e-2
+! *else
+! 	r,arg1, , ,  3,1e-2
+! *endif

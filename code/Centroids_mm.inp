@@ -1,0 +1,66 @@
+/com **********************************************************************************
+/com Log file that creates coilpack element centroid data file.
+/com The data file will be read in to the TOSCA model for evaluation of forces,
+/com the forces (force densities) will then be distributed among the element
+/com nodes in Ansys via a seperate script.
+/com 
+/com NOTE: ASSUMES ONLY THE COILPACK ELEMENTS AND NODES ARE CURRENTLY SELECTED!
+/com
+/com **********************************************************************************
+!
+!  *************************
+!  **** Soren Prestemon **** 
+!  **** LBL, 11/18/2002 ****
+!  *************************
+!
+! Open the output file:
+*cfopen,centroids,dat
+!
+! Define and initiate counters
+je=0      ! element counter
+enum=0    ! current element number
+ne=0      ! number of elements in the coilpack
+!
+! select coil element type 
+!
+ALLSEL,ALL  
+! select layers 1 and 2
+CMSEL,S,coil  
+!
+
+! select elements attached to volumes
+ESLV,R
+!
+! reselect solid186 type elements
+ESEL,R,ENAME,,solid186   
+!
+!
+! selct nodes
+!NSLE,S  
+!
+!ESEL,S,ENAME,,95
+!ESEL,A,ENAME,,45
+! remove all mid nodes (reduces from 20 nodes to 8)
+!EMID,REMOVE,ALL 
+!ALLSEL,ALL  
+!                end s.caspi
+!find the number of elements and write to centroid data file:
+*get,ne,elem,,count
+*vwrite,ne
+(F6.0)
+!
+! run through the elements:
+*do,je,1,ne
+  *get,enum,elem,enum,nxth
+!
+!  obtain the centroid location:
+   x=centrx(enum)*1e3
+   y=centry(enum)*1e3
+   z=centrz(enum)*1e3
+!
+!  write the data to the centroid data file:
+   *vwrite,x,y,z
+   (3(E10.3))
+!
+*enddo
+*cfclos

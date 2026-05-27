@@ -1,0 +1,501 @@
+! implement the pad and yoke for bladder and key
+! Y.Yang (05/21/2026)
+
+! -------------------------------------------------------
+! - Bladder and Keys Geometry
+! Also used in iron for booleans
+! -------------------------------------------------------
+! - Horizontal Key
+/inp,grab_nums,inp
+
+x1 = OR_collar+tpad+BeK_gap/2-h_ykey/2
+x2 = OR_collar+tpad+BeK_gap/2+h_ykey/2
+y1 = y_yhkey
+y2 = y_yhkey + w_ykey
+
+csys,0
+rectng,x1,x2,y1,y2
+cm,hkey,area
+
+! -------------------------------------------------------
+! - Horizontal Bladder
+asel,none
+
+y1 = y2 + w_tooth
+y2 = y1 + w_bladder
+
+csys,0
+rectng,x1,x2,y1,y2
+cm,hbladder,area
+! -------------------------------------------------------
+! - Vertical Key
+asel,none
+
+x1 = x_yvkey
+x2 = x_yvkey + w_ykey
+y1 = OR_collar+tpad+BeK_gap/2-h_ykey/2
+y2 = OR_collar+tpad+BeK_gap/2+h_ykey/2
+
+csys,0
+rectng,x1,x2,y1,y2
+cm,vkey,area
+
+! -------------------------------------------------------
+! - Vertical Bladder
+asel,none
+
+x1 = x2 + w_tooth
+x2 = x1 + w_bladder
+
+csys,0
+rectng,x1,x2,y1,y2
+cm,vbladder,area
+! -------------------------------------------------------
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! Iron pad
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/inp,grab_nums,inp
+
+x1 = 0
+y1 = OR_collar
+
+x2 = 0
+y2 = OR_collar+tpad
+
+x3 = OR_collar+tpad
+y3 = OR_collar+tpad
+
+x4 = OR_collar+tpad
+y4 = pad_gap
+
+x5 = sqrt(OR_collar**2-pad_gap**2)
+y5 = pad_gap
+
+csys,0
+k,knum+1,x1,y1
+k,knum+2,x2,y2
+k,knum+3,x3,y3
+k,knum+4,x4,y4
+k,knum+5,x5,y5
+
+l,knum+1,knum+2,
+l,knum+2,knum+3,
+l,knum+3,knum+4,
+l,knum+4,knum+5,
+csys,1
+l,knum+5,knum+1,
+csys,0
+
+! make area
+al,all
+cm,pad,area
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! Iron yoke
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/inp,grab_nums,inp
+
+ystart_fe = OR_collar + tpad + BeK_gap
+
+x1 = 0
+y1 = ystart_fe
+
+x2 = ystart_fe
+y2 = ystart_fe
+
+x3 = ystart_fe
+y3 = yoke_gap 
+
+x4 = sqrt(OR_yoke*OR_yoke-yoke_gap*yoke_gap)
+y4 = yoke_gap
+
+x5 = 0
+y5 = OR_yoke
+
+csys,0
+k,knum+1,x1,y1
+k,knum+2,x2,y2
+k,knum+3,x3,y3
+k,knum+4,x4,y4
+k,knum+5,x5,y5
+
+l,knum+1,knum+2,
+l,knum+2,knum+3,
+l,knum+3,knum+4,
+csys,1
+l,knum+4,knum+5,
+csys,0
+l,knum+5,knum+1,
+
+!make area
+al,all
+cm,yoke,area
+
+! -------------------------------------------------------
+! - Cut Keys - Pad
+cmsel,s,pad
+cmsel,a,vkey
+asba,pad,vkey,,delete,keep
+cmsel,u,vkey
+cm,pad,area
+
+cmsel,s,pad
+cmsel,a,hkey
+asba,pad,hkey,,delete,keep
+cmsel,u,hkey
+cm,pad,area
+
+cmsel,s,pad
+cmsel,a,hbladder
+asba,pad,hbladder,,delete,keep
+cmsel,u,hbladder
+cm,pad,area
+
+cmsel,s,pad
+cmsel,a,vbladder
+asba,pad,vbladder,,delete,keep
+cmsel,u,vbladder
+cm,pad,area
+! -------------------------------------------------------
+! Cut Keys - Yoke
+cmsel,s,yoke
+cmsel,a,vkey
+asba,yoke,vkey,,delete,keep
+cmsel,u,vkey
+cm,yoke,area
+
+cmsel,s,yoke
+cmsel,a,hkey
+asba,yoke,hkey,,delete,keep
+cmsel,u,hkey
+cm,yoke,area
+
+cmsel,s,yoke
+cmsel,a,hbladder
+cmsel,a,vbladder
+asba,yoke,all,,delete,delete
+cm,yoke,area
+! -------------------------------------------------------
+! - Round Holes
+! Hole 1 / Yoke
+asel,none
+alls,below,area
+cyl4, x_hex,0,d_hex/2.0,
+cm,hole,area
+cmsel,s,yoke
+alls,below,area
+cmsel,a,hole
+asba,all,hole,,delete,delete,
+cm,yoke,area
+
+
+! Hole 2 / Yoke
+asel,none
+alls,below,area
+cyl4, x_h1,y_h1,d_h1/2.0,
+cm,hole,area
+cmsel,s,yoke
+alls,below,area
+cmsel,a,hole
+asba,all,hole,,delete,delete,
+cm,yoke,area
+
+
+! Hole 1 / Pad
+asel,none
+alls,below,area
+cyl4, x_h2,y_h2,d_h2/2.0,
+cm,hole,area
+cmsel,s,pad
+alls,below,area
+cmsel,a,hole
+asba,all,hole,,delete,delete,
+cm,pad,area
+
+
+! Hole 2 / Pad
+asel,none
+alls,below,area
+cyl4, x_h3,y_h3,d_h3/2.0,
+cm,hole,area
+cmsel,s,pad
+alls,below,area
+cmsel,a,hole
+asba,all,hole,,delete,delete,
+cm,pad,area
+
+! Hole 3 / Pad for axial rod
+asel,none
+allsel,below,area
+cyl4,r_rod*cos(t_rod),r_rod*sin(t_rod),(d_rod+2e-3)*0.5
+cm,hole,area
+cmsel,s,pad
+allsel,below,area
+cmsel,a,hole
+asba,all,hole,,delete,delete,
+cm,pad,area
+
+! -------------------------------------------------------------
+! - Names
+cmsel,s,yoke
+cmsel,a,pad
+cm,iron,area
+! -------------------------------------------------------------
+! - Regenerate the keys to keep them separated
+cmsel,s,hkey
+alls,below,area
+agen,2,all
+cm,atmp,area
+cmsel,u,hkey
+cm,hkey,area
+cmsel,s,atmp
+cmsel,u,hkey
+adele,all, , , 1
+
+cmsel,s,vkey
+alls,below,area
+agen,2,all
+cm,atmp,area
+cmsel,u,vkey
+cm,vkey,area
+cmsel,s,atmp
+cmsel,u,vkey
+adele,all, , , 1
+
+!------------------------
+! extrude the geometry
+!------------------------
+! iron pad
+vsel,none
+cmsel,s,pad
+allsel,below,area
+vext,all, , , , , coil_length-end_length
+allsel,below,volu
+asel,r,loc,z,coil_length-end_length
+vext,all, , , , , end_length + t_endspacers
+cm,pad,volu
+vatt,mat_iron
+
+! iron yoke
+vsel,none
+cmsel,s,yoke
+vext,all, , , , , coil_length-end_length
+allsel,below,volu
+asel,r,loc,z,coil_length-end_length
+vext,all, , , , , end_length + t_endspacers
+cm,yoke,volu
+vatt,mat_iron
+
+! h-key
+vsel,none
+cmsel,s,hkey
+vext,all, , , , , coil_length-end_length
+allsel,below,volu
+asel,r,loc,z,coil_length-end_length
+vext,all, , , , , end_length + t_endspacers
+cm,hkey,volu
+vatt,mat_ss
+
+! v-key
+vsel,none
+cmsel,s,vkey
+vext,all, , , , , coil_length-end_length
+allsel,below,volu
+asel,r,loc,z,coil_length-end_length
+vext,all, , , , , end_length + t_endspacers
+cm,vkey,volu
+vatt,mat_ss
+
+! merge the h-key, v-key and pad
+cmsel,s,pad
+cmsel,a,hkey
+cmsel,a,vkey
+allsel,below,volu
+nummrg,kp,1e-6
+
+! fine mesh for the holes
+csys,0
+cmsel,s,pad
+allsel,below
+asel,r,loc,z,0
+allsel,below,area
+csys,1
+lsel,u,loc,x,OR_collar
+csys,0
+lsel,u,loc,y,pad_gap
+lsel,u,loc,x,0
+lsel,u,loc,x,OR_collar+tpad-h_ykey,OR_collar+tpad+h_ykey
+lsel,u,loc,y,OR_collar+tpad-h_ykey,OR_collar+tpad+h_ykey
+lesize,all,mesh_size*0.4
+
+! fine mesh for the h-key
+cmsel,s,hkey
+allsel,below
+*get,xmin,kp,,mnloc,x
+*get,ymin,kp,,mnloc,y
+*get,xmax,kp,,mxloc,x
+*get,ymax,kp,,mxloc,y
+cmsel,s,pad
+cmsel,a,hkey
+allsel,below
+asel,r,loc,z,0
+allsel,below,area
+lsel,r,loc,x,xmin,xmax
+lsel,r,loc,y,ymin,ymax
+lesize,all,mesh_size*0.4
+
+! fine mesh for the v-key
+cmsel,s,vkey
+allsel,below
+*get,xmin,kp,,mnloc,x
+*get,ymin,kp,,mnloc,y
+*get,xmax,kp,,mxloc,x
+*get,ymax,kp,,mxloc,y
+cmsel,s,pad
+cmsel,a,vkey
+allsel,below
+asel,r,loc,z,0
+allsel,below,area
+lsel,r,loc,x,xmin,xmax
+lsel,r,loc,y,ymin,ymax
+lesize,all,mesh_size*0.4
+
+! mesh
+cmsel,s,pad
+allsel,below
+asel,r,loc,z,0
+allsel,below,area
+lesize,all,mesh_size
+type,5
+amesh,all
+type,1
+vsweep,all
+aclear,all
+
+cmsel,s,hkey
+cmsel,a,vkey
+allsel,below,volu
+esize,mesh_size
+vsweep,all
+
+! fine mesh for the holes at the iron yoke
+csys,0
+cmsel,s,yoke
+allsel,below
+asel,r,loc,z,0
+allsel,below,area
+csys,1
+lsel,u,loc,x,OR_yoke
+csys,0
+lsel,u,loc,y,yoke_gap
+lsel,u,loc,x,0
+lsel,u,loc,y,ystart_fe,ystart_fe+h_ykey/2
+lsel,u,loc,x,ystart_fe,ystart_fe+h_ykey/2
+lesize,all,mesh_size*0.4
+
+cmsel,s,yoke
+allsel,below
+asel,r,loc,z,0
+allsel,below,area
+lesize,all,mesh_size
+type,5
+amesh,all
+type,1
+vsweep,all
+aclear,all
+
+!-----------------------------------------------
+! shell
+/inp,grab_nums,inp
+vsel,none
+asel,none
+lsel,none
+
+! Straight Section
+csys,0
+k,knum+1,OR_yoke ,0,0
+k,knum+2,OR_shell,0,0
+k,knum+3,0       ,OR_shell,0
+k,knum+4,0       ,OR_yoke ,0
+
+csys,0
+l,knum+1,knum+2
+l,knum+3,knum+4
+
+csys,1
+l,knum+2,knum+3
+l,knum+4,knum+1
+
+al,all
+
+vext,all, , , , , coil_length-end_length
+cm,shell,volu
+
+! End Part 1
+alls,below,volu
+asel,r,loc,z,coil_length-end_length
+vext,all, , , , , end_length + t_endspacers
+cm,shell,volu
+
+cmsel,s,shell
+*if,OR_eplate,eq,OR_shell,then
+ vatt,mat_ss
+*else
+ vatt,mat_ss
+*endif
+
+! mesh
+allsel,below,volu
+esize,mesh_size
+vsweep,all
+
+! ------------------------------------------------
+! axial rod
+/inp,grab_nums,inp
+vsel,none
+asel,none
+lsel,none
+
+cyl4,r_rod*cos(t_rod),r_rod*sin(t_rod),d_rod*0.5
+vext,all, , , , , length+teplate
+cm,rod,volu
+
+allsel,below,volu
+asel,r,loc,z,length+teplate
+vext,all, , , , , h_nut
+cm,rod,volu
+
+allsel,below,volu
+asel,r,loc,z,length+teplate+h_nut
+vext,all, , , , , l_rod-length-teplate-h_nut
+cm,rod,volu
+
+vatt,mat_al
+
+! mesh
+allsel,below,volu
+esize,mesh_size
+vsweep,all
+
+!---------------------------------------------------
+! axial rod nut
+/inp,grab_nums,inp
+vsel,none
+asel,none
+lsel,none
+
+wpoffs,0,0,length+teplate
+
+cyl4,r_rod*cos(t_rod),r_rod*sin(t_rod),d_rod*0.5,,d_nut*0.5
+vext,all, , , , , h_nut
+cm,nut,volu
+vatt,mat_ss
+
+! mesh
+allsel,below,volu
+esize,mesh_size
+vsweep,all
+
+wpoffs,0,0,-length-teplate
+

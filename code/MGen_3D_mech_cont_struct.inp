@@ -1,0 +1,710 @@
+! ------------------------------------------------------
+! - Notes
+! For the moment, starting with wedge coupled with coil, will
+! change later
+! -----------------------------------------------------------------
+! Real constant ans key option for the contact elements
+! keyopt(12)=0 standard (separation - sliding)
+! keyopt(12)=1 rough (separation - no sliding)
+! keyopt(12)=2 no separation (sliding)
+! keyopt(12)=5 bonded (no separation - no sliding)
+! keyopt(9)=1 Exclude both initial penetration or gap
+! keyopt(9)=0 Include both initial penetration or gap
+! keyopt(9)=3 Include offset only (contact real constant, positive being interf), exclude both initial penetration or gap
+
+! Parameters
+! arg1 = Contact Element Number
+! arg2 = Contact Element Name
+! arg3 = Keyopt 12 Value
+! arg4 = Keyopt 9 Value
+! arg5 = Friction Coefficient Value
+! arg6 = Real Constant 10 Value
+! arg7 = Target Element Number
+! arg8 = Target Element Type
+
+! - Define Contacts
+interf_collar = 0e-6
+gap_collarpair= -0.01e-3
+
+! Filler - Collar Top
+*use,ContactPropMacro.mac,30,'conta174',0,1,mu_all,0e-6,130,'targe170'
+
+! Filler - Collar Bot
+!*use,ContactPropMacro.mac,31,'conta174',0,1,mu_all,0e-6,131,'targe170'
+
+! Filler - Collar Filler 
+*use,ContactPropMacro.mac,32,'conta174',0,1,mu_all,0e-6,132,'targe170'
+
+! Collar-top - Pad
+*use,ContactPropMacro.mac,33,'conta174',0,1,mu_all,interf_collar,133,'targe170'
+
+! Collar-bot - Pad
+*use,ContactPropMacro.mac,34,'conta174',0,1,mu_all,interf_collar,134,'targe170'
+
+! Yoke - Shell
+*use,ContactPropMacro.mac,35,'conta174',0,1,mu_all,0e-6,135,'targe170'
+
+! do not lock the collar
+!! Collar - Key
+!*use,ContactPropMacro.mac,36,'conta174',0,1,mu_all,0e-6,136,'targe170'
+
+! Collar_bot - collar_fil
+*use,ContactPropMacro.mac,37,'conta174',0,1,mu_all,gap_collarpair,137,'targe170'
+
+! h-key - iron Yoke
+*use,ContactPropMacro.mac,38,'conta174',0,1,mu_all,0e-6,138,'targe170'
+
+! v-key - iron yoke
+*use,ContactPropMacro.mac,39,'conta174',0,1,mu_all,0e-6,139,'targe170'
+
+! EPlate - Coil
+*use,ContactPropMacro.mac,40,'conta174',0,1,mu_all,0e-6,140,'targe170'
+
+*if,OR_eplate,eq,OR_shell,then
+ ! Eplate - Shell
+ *use,ContactPropMacro.mac,41,'conta174',5,1,mu_all,0e-6,141,'targe170'
+ 
+*else
+ ! End plate - Yoke
+ *use,ContactPropMacro.mac,42,'conta174',0,1,mu_all,0e-6,142,'targe170'
+
+ ! End plate - Rod
+ *use,ContactPropMacro.mac,43,'conta174',0,1,mu_all,0e-6,143,'targe170'
+
+ ! Rod - nut
+ *use,ContactPropMacro.mac,44,'conta174',5,1,mu_all,0e-6,144,'targe170'
+
+*endif
+
+! ---------------------------------------------------------------------
+! Coil - Nose Top - Layer 1
+*use,ContactPropMacro.mac,50,'conta174',0,3,mu_all,0e-6,150,'targe170'
+
+! Coil - Nose Fil - Layer 1
+*use,ContactPropMacro.mac,51,'conta174',0,3,mu_all,0e-6,151,'targe170'
+
+! Coil - Nose Top - Layer 2
+*use,ContactPropMacro.mac,52,'conta174',0,3,mu_all,0e-6,152,'targe170'
+
+! Coil - Nose Fil - Layer 2
+*use,ContactPropMacro.mac,53,'conta174',0,3,mu_all,0e-6,153,'targe170'
+
+! ---------------------------------------------------------------------
+! Pole - Nose Top
+*use,ContactPropMacro.mac,60,'conta174',0,1,mu_all,0e-6,160,'targe170'
+
+! Pole - Nose Fil
+*use,ContactPropMacro.mac,61,'conta174',0,1,mu_all,0e-6,161,'targe170'
+! ---------------------------------------------------------------------
+! Filler - Collar Top
+type,30
+
+csys,1
+real,30
+mat,30
+
+! Generate the target surface
+cmsel,s,filler
+alls,below,volu
+asel,r,loc,x,r22+tfiller
+nsla,s,1
+esln,s,0
+type,130
+esurf,all
+alls
+
+! Generate the contact surface
+cmsel,s,collar_top
+alls,below,volu
+csys,1
+asel,r,loc,x,r22+tfiller
+nsla,s,1
+esln,s,0
+type,30
+esurf,all
+alls
+
+! Filler - Collar Bot
+! type,31
+
+! csys,1
+! real,31
+! mat,31
+
+! ! Generate the target surface
+! cmsel,s,filler
+! alls,below,volu
+! asel,r,loc,x,r22+tfiller
+! nsla,s,1
+! esln,s,0
+! type,131
+! esurf,all
+! alls
+
+! ! Generate the contact surface
+! cmsel,s,collar_bot
+! alls,below,volu
+! csys,1
+! asel,r,loc,x,r22+tfiller
+! nsla,s,1
+! esln,s,0
+! type,31
+! esurf,all
+! alls
+
+! Filler - Collar Filler 
+type,32
+
+csys,1
+real,32
+mat,32
+
+cmsel,s,filler
+alls,below,volu
+asel,r,loc,x,r22+tfiller
+nsla,s,1
+esln,s,0
+type,132
+esurf,all
+alls
+
+! Generate the contact surface
+cmsel,s,collar_fil
+alls,below,volu
+csys,1
+asel,r,loc,x,r22+tfiller
+nsla,s,1
+esln,s,0
+type,32
+esurf,all
+alls
+
+! Collar top - pad
+type,33
+
+csys,1
+real,33
+mat,33
+
+cmsel,s,pad
+allsel,below,volu
+asel,r,loc,x,rin_yoke
+nsla,s,1
+esln,s,0
+type,133
+esurf,all
+alls
+
+! Generate the contact surface
+cmsel,s,collar_top
+allsel,below,volu
+asel,r,loc,x,rin_yoke
+nsla,s,1
+esln,s,0
+type,33
+esurf,all
+allsel
+
+! Collar bot - Pad
+type,34
+
+csys,1
+real,34
+mat ,34
+
+cmsel,s,pad
+allsel,below,volu
+asel,r,loc,x,rin_yoke
+nsla,s,1
+esln,s,0
+type,134
+esurf,all
+alls
+
+! Generate the contact surface
+cmsel,s,collar_bot
+cmsel,a,collar_fil
+allsel,below,volu
+asel,r,loc,x,rin_yoke
+nsla,s,1
+esln,s,0
+type,34
+esurf,all
+allsel
+
+! Yoke - shell
+type,35
+
+csys,1
+real,35
+mat ,35
+
+cmsel,s,shell
+allsel,below,volu
+asel,r,loc,x,OR_yoke
+nsla,s,1
+esln,s,0
+type,135
+esurf,all
+alls
+
+! Generate the contact surface
+cmsel,s,yoke
+allsel,below,volu
+asel,r,loc,x,OR_yoke
+nsla,s,1
+esln,s,0
+type,35
+esurf,all
+allsel
+
+! ! -----------------------------------------------------------------
+! ! Collar - Key
+! csys,0
+! real,36
+! mat ,36
+
+! ! Generate the target surface
+! cmsel,s,ckey
+! allsel,below,volu
+! *get,ymax,kp,,mxloc,y
+! *get,ymin,kp,,mnloc,y
+! asel,r,loc,y,ymax
+! nsla,r,1
+! esln,r,0
+! type,136
+! esurf,all
+! allsel
+
+! ! Generate the contact surface
+! cmsel,s,collar_bot
+! allsel,below,volu
+! asel,r,loc,y,ymax
+! nsla,r,1
+! esln,r,0
+! type,36
+! esurf,all
+! allsel
+
+! -----------------------------------------------------------------
+! Collar bot - collar fil
+csys,0
+real,37
+mat ,37
+
+! Generate the target surface
+cmsel,s,collar_bot
+allsel,below,volu
+*get,xmin,kp,,mnloc,x
+asel,r,loc,x,xmin
+cm,tmp,area
+cmsel,s,collar_bot
+allsel,below,volu
+*get,ymax,kp,,mxloc,y
+asel,r,loc,y,ymax
+cmsel,a,tmp
+nsla,r,1
+esln,r,0
+type,137
+esurf,all
+allsel
+
+! Generate the contact surface
+cmsel,s,collar_fil
+allsel,below,volu
+asel,r,loc,x,xmin
+cm,tmp,area
+cmsel,s,collar_fil
+allsel,below,volu
+asel,r,loc,y,ymax
+cmsel,a,tmp
+nsla,r,1
+esln,r,0
+type,37
+esurf,all
+allsel
+
+! -----------------------------------------------------------------
+! h-key - iron yoke
+csys,0
+real,38
+mat ,38
+
+! Generate the target surface
+cmsel,s,hkey
+allsel,below
+*get,xmax,kp,,mxloc,x
+*get,ymin,kp,,mnloc,y
+*get,ymax,kp,,mxloc,y
+
+cmsel,s,yoke
+allsel,below,volu
+asel,r,loc,x,xmax
+asel,r,loc,y,0,ymax
+nsla,r,1
+esln,r,0
+type,138
+esurf,all
+allsel
+
+! Generate the contact surface
+cmsel,s,hkey
+allsel,below,volu
+asel,r,loc,x,xmax
+nsla,r,1
+esln,r,0
+type,38
+esurf,all
+allsel
+
+! -----------------------------------------------------------------
+! v-key - iron yoke
+csys,0
+real,39
+mat ,39
+
+! Generate the target surface
+cmsel,s,vkey
+allsel,below
+*get,xmin,kp,,mnlox,x
+*get,xmax,kp,,mxloc,x
+*get,ymin,kp,,mnloc,y
+*get,ymax,kp,,mxloc,y
+
+cmsel,s,yoke
+allsel,below,volu
+asel,r,loc,y,ymax
+asel,r,loc,x,0,xmax
+nsla,r,1
+esln,r,0
+type,139
+esurf,all
+allsel
+
+! Generate the contact surface
+cmsel,s,vkey
+allsel,below,volu
+asel,r,loc,y,ymax
+nsla,r,1
+esln,r,0
+type,39
+esurf,all
+allsel
+
+!----------------------------------------------------------------------
+! EPlate - Coil
+type,40
+
+csys,1
+real,40
+mat,40
+
+! Generate the target surface
+cmsel,s,eplate
+alls,below,volu
+asel,r,loc,z,length
+nsla,s,1
+esln,s,0
+type,140
+esurf,all
+alls
+
+! Generate the contact surface
+cmsel,s,layer1
+cmsel,a,layer2
+cmsel,a,interlay
+alls,below,volu
+csys,1
+asel,r,loc,z,length
+nsla,s,1
+esln,s,0
+type,40
+esurf,all
+allsel
+
+*if,OR_eplate,eq,OR_shell,then
+! endplate - shell (welding)
+type,41
+
+csys,1
+real,41
+mat ,41
+
+! Generate the target surface
+cmsel,s,eplate
+alls,below,volu
+asel,r,loc,z,length
+nsla,s,1
+esln,s,0
+type,140
+esurf,all
+alls
+
+! Generate the contact surface
+cmsel,s,shell
+alls,below,volu
+csys,1
+asel,r,loc,z,length
+nsla,s,1
+esln,s,0
+type,41
+esurf,all
+allsel
+
+*else
+! -----------------------------------------------------------------
+! End plate - Yoke
+type,42
+
+csys,1
+real,42
+mat ,42
+
+! Generate the target surface
+cmsel,s,yoke
+cmsel,a,pad
+alls,below,volu
+asel,r,loc,z,length
+nsla,s,1
+esln,s,0
+type,142
+esurf,all
+alls
+
+! Generate the contact surface
+cmsel,s,eplate
+alls,below,volu
+csys,1
+asel,r,loc,z,length
+nsla,s,1
+esln,s,0
+type,42
+esurf,all
+allsel
+
+! -----------------------------------------------------------------
+! End plate - Rod
+type,43
+
+csys,1
+real,43
+mat ,43
+
+! Generate the target surface
+cmsel,s,eplate
+alls,below,volu
+asel,r,loc,z,length+teplate
+nsla,s,1
+esln,s,0
+type,143
+esurf,all
+alls
+
+! Generate the contact surface
+cmsel,s,nut
+alls,below,volu
+*get,zmin,kp,,mnloc,z
+asel,r,loc,z,zmin
+nsla,s,1
+esln,s,0
+type,43
+esurf,all
+allsel
+
+! -----------------------------------------------------------------
+! Rod - nut
+type,44
+
+local,15,1,r_rod*cos(t_rod),r_rod*sin(t_rod),0
+
+csys,15
+real,44
+mat ,44
+
+! Generate the target surface
+cmsel,s,nut
+alls,below,volu
+asel,r,loc,x,d_rod*0.5
+nsla,s,1
+esln,s,0
+type,144
+esurf,all
+alls
+
+! Generate the contact surface
+cmsel,s,rod
+alls,below,volu
+asel,r,loc,x,d_rod*0.5
+asel,r,loc,z,length+teplate,length+teplate+h_nut
+nsla,s,1
+esln,s,0
+type,44
+esurf,all
+allsel
+
+csys,0
+
+*endif
+
+! -----------------------------------------------------------------
+! - Coil to Nose
+*use,CoilContMacro_v3.mac,'collar_nose_1','anose1_back','empty',1e-3
+*use,CoilContMacro_v3.mac,'collar_nose_2','anose2_back','empty',1e-3
+
+! Coil - Nose Top - Layer 1
+real,50
+mat,50
+csys,0
+
+cmsel,s,collar_nose_top
+alls,below,volu
+cmsel,r,anose1_back
+asel,r,loc,z,0,coil_length-end_length-1e-5
+nsla,s,1
+esln,s,0
+type,150
+esurf,all
+alls
+
+cmsel,s,coil11
+alls,below,volu
+cmsel,r,acoil1_front
+asel,r,loc,z,0,coil_length-end_length-1e-5
+nsla,s,1
+esln,s,0
+type,50
+esurf,all
+alls
+
+! Coil - Nose Fil - Layer 1
+real,51
+mat,51
+csys,0
+
+cmsel,s,collar_nose_fil
+alls,below,volu
+cmsel,r,anose1_back
+asel,r,loc,z,0,coil_length-end_length-1e-5
+nsla,s,1
+esln,s,0
+type,151
+esurf,all
+alls
+
+cmsel,s,coil11
+alls,below,volu
+cmsel,s,acoil1_front
+aslv,r
+asel,r,loc,z,0,coil_length-end_length-1e-5
+nsla,s,1
+esln,s,0
+type,51
+esurf,all
+alls
+
+! Coil - Nose Top - Layer 2
+real,52
+mat,52
+csys,0
+
+cmsel,s,collar_nose_top
+alls,below,volu
+cmsel,r,anose2_back
+asel,r,loc,z,0,coil_length-end_length-1e-5
+nsla,s,1
+esln,s,0
+type,152
+esurf,all
+alls
+
+cmsel,s,coil21
+alls,below,volu
+cmsel,r,acoil2_front
+asel,r,loc,z,0,coil_length-end_length-1e-5
+nsla,s,1
+esln,s,0
+type,52
+esurf,all
+alls
+
+! Coil - Nose Fil - Layer 2
+real,53
+mat,53
+csys,0
+
+cmsel,s,collar_nose_fil
+alls,below,volu
+cmsel,r,anose2_back
+asel,r,loc,z,0,coil_length-end_length-1e-5
+nsla,s,1
+esln,s,0
+type,153
+esurf,all
+alls
+
+cmsel,s,coil21
+alls,below,volu
+cmsel,s,acoil2_front
+aslv,r
+asel,r,loc,z,0,coil_length-end_length-1e-5
+nsla,s,1
+esln,s,0
+type,53
+esurf,all
+alls
+! -----------------------------------------------------------------
+! - Nose to pole
+
+! Pole - Nose Top - Layer 1
+real,60
+mat,60
+csys,0
+
+cmsel,s,collar_nose_top
+alls,below,volu
+asel,r,loc,z,coil_length-end_length-1e-5,coil_length-end_length+1e-5
+nsla,s,1
+esln,s,0
+type,160
+esurf,all
+alls
+
+cmsel,s,poletip1
+cmsel,a,poletip2
+cmsel,a,interlay
+cmsel,a,filler
+alls,below,volu
+asel,r,loc,z,coil_length-end_length-1e-5,coil_length-end_length+1e-5
+nsla,s,1
+esln,s,0
+type,60
+esurf,all
+alls
+
+! Pole - Nose Top - Layer 1
+real,61
+mat,61
+csys,0
+
+cmsel,s,collar_nose_fil
+alls,below,volu
+asel,r,loc,z,coil_length-end_length-1e-5,coil_length-end_length+1e-5
+nsla,s,1
+esln,s,0
+type,161
+esurf,all
+alls
+
+cmsel,s,poletip1
+cmsel,a,poletip2
+cmsel,a,interlay
+cmsel,a,filler
+alls,below,volu
+asel,r,loc,z,coil_length-end_length-1e-5,coil_length-end_length+1e-5
+nsla,s,1
+esln,s,0
+type,61
+esurf,all
+alls
+! -----------------------------------------------------------------
+alls

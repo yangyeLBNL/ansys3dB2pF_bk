@@ -1,0 +1,239 @@
+! compare to the 2d results
+! Get peak strain/stress in the coil
+/post1
+allsel
+
+! Visualization options
+! Color Plot
+/PNUM,AREA,1
+/PNUM,VOLU,0
+/PNUM,NODE,0
+/PNUM,TABN,0
+/PNUM,SVAL,0
+/PNUM,DOMA,0
+/NUMBER,1   
+/PNUM,MAT,1 
+aplot
+
+! Contours
+/AUTO,1
+/DSCALE,1,OFF
+
+/PLOPTS,INFO,1
+/PLOPTS,LEG1,1
+/PLOPTS,LEG2,0
+/PLOPTS,LEG3,1
+/PLOPTS,FRAME,1
+/PLOPTS,TITLE,1
+/PLOPTS,MINM,1
+/PLOPTS,FILE,0
+/PLOPTS,WINS,1
+/PLOPTS,WP,0
+/PLOPTS,DATE,0
+/TRIAD,OFF
+
+/gfile,1000
+
+/dev,font,1,Courier*New,400,0,-24,0,0,,,
+
+/RGB,INDEX,100,100,100, 0
+/RGB,INDEX, 80, 80, 80,13
+/RGB,INDEX, 60, 60, 60,14
+/RGB,INDEX, 0, 0, 0,15
+
+/view,1,0,0,-1
+
+csys,0
+rsys,0
+
+! delete the figures
+db_name = 'B2pF_3D'
+/sys,del %db_name%*.png
+
+! record the maximum stress to file
+
+*cfopen,%db_name%_peak_stress2d,txt
+*vwrite,'step','part','smax'
+(1A5,1A10,1A10)
+
+! case loop
+*do,icase,1,nind
+
+  set,,,,,icase
+  
+  allsel
+  /auto,1
+  
+  /view,1,0,-0.4,-1
+  
+  ! contact at the cross section
+  cmsel,s,coil11
+  cmsel,a,coil21
+  allsel,below,volu
+  esel,s,type,,50,53
+  nsel,r,loc,z,0
+  esln,r
+  
+  /show,png
+  plnsol,cont,pres
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_pole_contpres2d_case%icase%,png
+  
+  allsel
+  
+  /view,1,0,0,-1
+  
+  ! coil equivalent stress
+  cmsel,s,coil
+  allsel,below,volu
+  nsel,r,loc,z,0
+  esln,r
+  
+  /show,png
+  plnsol,s,eqv
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_seqv2d_case%icase%,png
+  *get,s_coil,plnsol,0,max
+  
+  ! coil stress along the winding direction
+  rsys,solu
+  /show,png
+  plnsol,s,z
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_sz2d_case%icase%,png
+  
+  ! coil stress along the transverse direction
+  /show,png
+  plnsol,s,x
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_sx2d_case%icase%,png
+  
+  /show,png
+  plnsol,s,y
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_sy2d_case%icase%,png
+  
+  ! displacement
+  rsys,1
+  /show,png
+  plnsol,u,x
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_ux2d_case%icase%,png
+  
+  /show,png
+  plnsol,u,y
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_uy2d_case%icase%,png
+  
+  /show,png
+  plnsol,u,x
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_uz2d_case%icase%,png
+  
+  /show,png
+  plnsol,u,sum
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_usum2d_case%icase%,png
+  
+  allsel
+  rsys,0
+
+  
+  ! wedge equivalent stress
+  cmsel,s,wedge1
+  cmsel,a,wedge2
+  allsel,below,volu
+  nsel,r,loc,z,0
+  esln,r
+  
+  /show,png
+  plnsol,s,eqv
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_wedge_seqv2d_case%icase%,png
+  *get,s_wedge,plnsol,0,max
+  
+  allsel
+  
+  rsys,1
+  
+  ! collar-top
+  cmsel,s,collar_top
+  cmsel,a,collar_nose_top
+  allsel,below,volu
+  nsel,r,loc,z,0
+  esln,r
+  
+  /show,png
+  plnsol,s,eqv
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_collartop_seqv2d_case%icase%,png
+  *get,s_collar1,plnsol,0,max
+  
+  /show,png
+  plnsol,u,x
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_collartop_ux2d_case%icase%,png
+  
+  /show,png
+  plnsol,u,y
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_collartop_uy2d_case%icase%,png
+  
+  /dscale,,100
+  /show,png
+  plnsol,u,sum
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_collartop_usum2d_case%icase%,png
+  /dscale,,0
+
+  allsel
+  
+  ! collar-bottom
+  cmsel,s,collar_bot
+  cmsel,a,collar_fil
+  cmsel,a,collar_nose_fil
+  allsel,below,volu
+  nsel,r,loc,z,0
+  esln,r
+  
+  /show,png
+  plnsol,s,eqv
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_collarbot_seqv2d_case%icase%,png
+  *get,s_collar2,plnsol,0,max
+
+  /show,png
+  plnsol,u,x
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_collarbot_ux2d_case%icase%,png
+  
+  /show,png
+  plnsol,u,y
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_collarbot_uy2d_case%icase%,png
+  
+  /dscale,,100
+  /show,png
+  plnsol,u,sum
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_collarbot_usum2d_case%icase%,png
+  /dscale,,0
+
+  allsel
+  rsys,0
+  
+  ! record the peak stress
+  *vwrite,icase,'coil'     ,s_coil*1e-6
+(1F5.0,1A10,1F10.1)
+  *vwrite,icase,'wedge'    ,s_wedge*1e-6
+(1F5.0,1A10,1F10.1)
+  *vwrite,icase,'collar-t' ,s_collar1*1e-6
+(1F5.0,1A10,1F10.1)
+  *vwrite,icase,'collar-b' ,s_collar2*1e-6
+(1F5.0,1A10,1F10.1)
+  *vwrite,
+('')
+
+*enddo
+
+*cfclos

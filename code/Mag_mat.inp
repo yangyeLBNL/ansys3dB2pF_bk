@@ -1,0 +1,227 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!Material properties
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! --------------------------------------------------
+! - Coil - NbTi Isotropic
+*set,mat_coil,1
+mptemp,1,4.3,293
+! x - winding direction
+mpdata,ex,  mat_coil,1,66e9,66e9
+mpdata,ey,  mat_coil,1,8e9,8e9
+mpdata,ez,  mat_coil,1,8e9,8e9
+mpdata,gyz, mat_coil,1,18.8e9,18.8e9
+mpdata,gxy, mat_coil,1,19.8e9,19.8e9
+mpdata,gxz, mat_coil,1,22.9e9,22.9e9
+mpdata,pryz,mat_coil,1,0.19,0.19
+mpdata,prxy,mat_coil,1,0.17,0.17
+mpdata,prxz,mat_coil,1,0.23,0,23
+mp,    alpx,mat_coil,8.78e-6
+mp,    alpy,mat_coil,1.89e-5
+mp,    alpz,mat_coil,1.89E-5    !5.6e-3, 5.6e-3, 2.6e-3
+mp,    murx,mat_coil,1
+! --------------------------------------------------
+!Coil (1) - Isotropic
+! *set,mat_coil,1
+! mptemp,1,4.3,293
+! mpdata,ex,  mat_coil,1,20000e6,20000e6
+! ! mpdata,ex,  mat_coil,1,25000e6,25000e6
+! mpdata,prxy,mat_coil,1,0.3,0.3
+! mp,    alpx,mat_coil,1.35E-5    !3.36e-3	
+! mp,    murx,mat_coil,1
+
+! Coil (1) - Ortho - 3D
+! *set,mat_coil,1
+! mptemp,1,4.3,293
+! mpdata,ex,  mat_coil,1,55e9,55e9
+! mpdata,ey,  mat_coil,1,25e9,25e9
+! mpdata,ez,  mat_coil,1,20e9,20e9
+! mpdata,gyz, mat_coil,1,19e9,19e9
+! mpdata,gxy, mat_coil,1,20e9,20e9
+! mpdata,gxz, mat_coil,1,23e9,23e9
+! mpdata,pryz,mat_coil,1,0.25,0.25
+! mpdata,prxy,mat_coil,1,0.3,0.3
+! mpdata,prxz,mat_coil,1,0.3,0.3
+! mp,    alpy,mat_coil,1.35E-5
+! mp,    alpz,mat_coil,1.35E-5
+! mp,    alpx,mat_coil,1.10E-5
+! mp,    murx,mat_coil,1
+
+! Coil (1) - Ortho/SS
+! x - width / radial
+! y - thickness / azimuthal
+! z - along the cable length
+! ax_coil = 4.438e-3/(293-4.3)
+! ay_coil = 4.030e-3/(293-4.3)
+! az_coil = 3.141e-3/(293-4.3)
+
+! *set,mat_coil,1
+! mptemp,1,4.3,293							! Temperatures
+! mpdata,ey,  mat_coil,1,48000e6,52600e6		! Elastic moduli
+! mpdata,ex,  mat_coil,1,36000e6,37400e6
+! mpdata,ez,  mat_coil,1,77000e6,66100e6
+! mpdata,gxy, mat_coil,1,18800E6,17700e6   	! (Ex/2+Ey/2)/(2*(1+Nuxy))
+! mpdata,gyz, mat_coil,1,19900E6,22500e6   	! (Ex/2+Ey/2)/(2*(1+Nuxy))
+! mpdata,gxz, mat_coil,1,22900E6,24200e6   	! (Ex/2+Ey/2)/(2*(1+Nuxy))
+! mpdata,prxy,mat_coil,1,0.2,0.2				! Poisson	
+! mpdata,pryz,mat_coil,1,0.3,0.3				! Poisson	
+! mpdata,prxz,mat_coil,1,0.3,0.3				! Poisson	
+! mp,    alpx,mat_coil,ax_coil
+! mp,    alpy,mat_coil,ay_coil
+! mp,    alpz,mat_coil,az_coil   
+
+! Etg_rt_coil = 12e9
+! rp02_rt_coil = 30e6
+
+! Etg_cd_coil = 12e9
+! rp02_cd_coil = 33e6
+
+! tb,biso,mat_coil,2 ! Isotropic Hardening / Two Temps
+! ! tb,bkin,mat_cu,2,,0 ! Kinematic Hardening / Two Temps / / No stress relaxation
+! TBTEMP,4.3
+! tbdata,1,rp02_cd_coil		! Yield Stress
+! tbdata,2,Etg_cd_coil		! Tangent Modulus
+! TBTEMP,293
+! tbdata,1,rp02_rt_coil		! Yield Stress
+! tbdata,2,Etg_rt_coil		! Tangent Modulus
+
+!Stainless steel (2)
+*set,mat_ss,2
+mptemp,1,4.3,293
+mpdata,ex,  mat_ss,1,210000e6,193000e6
+mpdata,prxy,mat_ss,1,0.28,0.28
+mp,    alpx,mat_ss,9.83E-6    !2.84e-3
+mp,    murx,mat_ss,1
+
+!Aluminum bronze (3)
+*set,mat_albr,3
+mptemp,1,4.3,293
+mpdata,ex,  mat_albr,1,120000e6,110000e6
+mpdata,prxy,mat_albr,1,0.3,0.3
+mp,    alpx,mat_albr,1.08E-5    !3.12e-3
+mp,    murx,mat_albr,1
+
+!Iron (4)
+*set,mat_iron,4
+mptemp,1,4.3,293
+mpdata,ex,  mat_iron,1,224000e6,213000e6
+mpdata,prxy,mat_iron,1,0.28,0.28
+mp,    alpx,mat_iron,6.82E-6    !1.97e-3
+
+!Aluminum (5)
+*set,mat_al,5
+mptemp,1,4.3,293
+mpdata,ex,  mat_al,1,79000e6,70000e6
+mpdata,prxy,mat_al,1,0.34,0.34
+mp,    alpx,mat_al,1.45E-5    !4.2e-3
+mp,    murx,mat_al,1
+
+!G10 (6)
+*set,mat_g10,6
+mptemp,1,4.3,293
+mpdata,ex,  mat_g10,1,16e9,13e9
+mpdata,ey,  mat_g10,1,32e9,25e9
+mpdata,ez,  mat_g10,1,32e9,25e9
+mpdata,prxy,mat_g10,1,0.21,0.15
+mpdata,pryz,mat_g10,1,0.21,0.15
+mpdata,prxz,mat_g10,1,0.21,0.15
+mpdata,gxy, mat_g10,1,6.6e9,5.2e9
+mpdata,gyz, mat_g10,1,2.9e9,2.3e9
+mpdata,gxz, mat_g10,1,6.6e9,5.2e9
+mp,    alpx,mat_g10,2.63E-5    !7.06e-3
+mp,    alpy,mat_g10,9.40e-6
+mp,    alpz,mat_g10,9.40e-6
+mp,    murx,mat_g10,1
+
+! 7 - ODS Copper Wedges (Glidcop) -- CERN Thesis 2017-078, Yield is 332 MPa
+*set,mat_cu,14
+mptemp,1,4.3,293
+mpdata,ex  ,mat_cu,1,95000e6,88000e6
+mpdata,prxy,mat_cu,1,0.33,0.33
+mp    ,alpx,mat_cu,1.11E-5
+
+!Nitronic 40 (8)
+*set,mat_n40,8
+mptemp,1,4.3,293
+mpdata,ex,  mat_n40,1,225000e6,210000e6
+mpdata,prxy,mat_n40,1,0.28,0.28
+mp,    alpx,mat_n40,0.90E-5    !2.6e-3
+mp,    murx,mat_n40,1
+
+! Stainless Steel - Half Modulus
+*set,mat_ss_h,11
+mptemp,1,4.3,293
+mpdata,ex,  mat_ss_h,1,210000e6/2,193000e6/2
+mpdata,ey,  mat_ss_h,1,210000e6/2,193000e6/2
+mpdata,ez,  mat_ss_h,1,210e9*0.1,193e9*0.1
+mpdata,prxy,mat_ss_h,1,0.28,0.28
+mpdata,pryz,mat_ss_h,1,0.00,0.00
+mpdata,prxz,mat_ss_h,1,0.00,0.00
+mpdata,gxy ,mat_ss_h,1,210e9*0.5/2/1.28,193e9*0.5/2/1.28
+mpdata,gyz ,mat_ss_h,1,210e9*0.5/2/1.00,193e9*0.5/2/1.00
+mpdata,gxz ,mat_ss_h,1,210e9*0.1/2/1.00,193e9*0.1/2/1.00
+mp,    alpx,mat_ss_h,9.83E-6    !2.84e-3
+mp,    alpy,mat_ss_h,9.83E-6    !2.84e-3
+mp,    alpz,mat_ss_h,9.83E-6    !2.84e-3
+mp,    murx,mat_ss_h,1
+
+!G10 PoleKey - can be rotated separately from other G10 components (9)
+*set,mat_g10_r,9
+mptemp,1,4.3,293
+mpdata,ex,  mat_g10_r,1,30000e6,30000e6 ! s3
+! mpdata,ex,  mat_g10_r,1,20000e6,20000e6 ! s1
+mpdata,prxy,mat_g10_r,1,0.3,0.3
+mp,    alpx,mat_g10_r,0.846E-5 ! s3/s5
+! mp,    alpx,mat_g10_r,2.44E-5    ! s1
+mp,    murx,mat_g10_r,1
+
+!Titanium (10)
+*set,mat_ti,10
+mptemp,1,4.3,293
+mpdata,ex,  mat_ti,1,130000e6,130000e6
+mpdata,prxy,mat_ti,1,0.3,0.3
+mp,    alpx,mat_ti,6.03E-6    !1.74e-3
+mp,    murx,mat_ti,1
+
+!Nitronic 40 - half modulus (11)
+*set,mat_n40_h,7
+mptemp,1,4.3,293
+mpdata,ex,  mat_n40_h,1,225000e6*0.5,210000e6*0.5
+mpdata,ey,  mat_n40_h,1,225000e6*0.5,210000e6*0.5
+mpdata,ez,  mat_n40_h,1,225000e6*0.1,210000e6*0.1
+mpdata,prxy,mat_n40_h,1,0.28,0.28
+mpdata,pryz,mat_n40_h,1,0.20,0.00
+mpdata,prxz,mat_n40_h,1,0.20,0.00
+mpdata,gxy ,mat_n40_h,1,225e9*0.5/2/1.28,210e6*0.5/2/1.28
+mpdata,gyz ,mat_n40_h,1,225e9*0.1/2/1.20,210e6*0.1/2/1.00
+mpdata,gxz ,mat_n40_h,1,225e9*0.1/2/1.20,210e6*0.1/2/1.00
+mp,    alpx,mat_n40_h,0.90E-5    !2.6e-3
+mp,    alpy,mat_n40_h,0.90E-5    !2.6e-3
+mp,    alpz,mat_n40_h,0.90E-5    !2.6e-3
+mp,    murx,mat_n40_h,1
+
+! Invar (12) - Data from NIST
+tc = 40e-5
+*set,mat_in,12
+mptemp,1,4.3,293
+mpdata,ex,  mat_in,1,141e9,152e9
+mpdata,prxy,mat_in,1,0.28,0.28
+mp,    alpx,mat_in,1.3e-6   ! 4.0e-4 	! INVAR
+mp,    murx,mat_in,1
+
+! NbTi coil with double transverse modulus (13)
+*set,mat_end,13
+mptemp,1,4.3,293
+! x - winding direction
+mpdata,ex,  mat_end,1,66e9,66e9
+mpdata,ey,  mat_end,1,16e9,16e9
+mpdata,ez,  mat_end,1,16e9,16e9
+mpdata,gyz, mat_end,1,18.8e9,18.8e9
+mpdata,gxy, mat_end,1,19.8e9,19.8e9
+mpdata,gxz, mat_end,1,22.9e9,22.9e9
+mpdata,pryz,mat_end,1,0.19,0.19
+mpdata,prxy,mat_end,1,0.17,0.17
+mpdata,prxz,mat_end,1,0.23,0,23
+mp,    alpx,mat_end,8.78e-6
+mp,    alpy,mat_end,1.89e-5
+mp,    alpz,mat_end,1.89E-5    !5.6e-3, 5.6e-3, 2.6e-3
+mp,    murx,mat_end,1

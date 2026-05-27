@@ -1,0 +1,335 @@
+! ------------------------------------------------------
+! - Dipole with split wedge example
+! G. Vallone, 11/2021
+! /inp,B2pF-mech-3D,inp
+! ------------------------------------------------------
+FINISH
+/CLEAR,START
+
+! Title and database filename
+/title,B2pF 3D
+db_name = 'B2pF_3D'
+/filname,%db_name%,0
+
+! ------------------------------------------------------
+! - Import coil end
+/inp,B2pF-parameters,inp
+
+l_extend = 1.0 		    ! How much we extend lines
+! delta_z = 400   ! Might be easier to define as a max z
+
+end_length   = end_length*1e3
+t_endspacers = t_endspacers*1e3
+coil_length  = length*1e3 - t_endspacers
+*use,Roxie2Ansys_v7.mac,file_name,file_ext,l_extend,coil_radius_str,coil_length,end_length,t_endspacers,mesh_size
+
+! Reload materials and parameters
+mpdele,all,all
+/inp,Mag_mat,inp
+/inp,B2pF-parameters,inp
+
+! delete the coil at the second layer and generate a new volume
+*do,i,1,4
+ cmsel,s,coil2%i%
+ allsel,below
+ vgen,2,all
+ cm,tmp,volu
+
+ cmsel,s,coil2%i%
+ allsel,below
+ vclear,all
+ vdele,all
+
+ cmsel,s,tmp
+ allsel,below
+ cm,coil2%i%,volu
+*enddo
+
+cmsel,s,coil21
+cmsel,a,coil22
+cmsel,a,coil23
+cmsel,a,coil24
+cm,coil2,volu
+
+cmsel,a,coil1
+cm,coil,volu
+
+cmsel,s,coil2
+vsel,r,loc,z,coil_length-end_length,coil_length
+cm,outer_layer,volu
+
+! rename
+! end spacer
+cmsel,s,wedge1
+allsel,below
+vsel,r,loc,z,coil_length-end_length,coil_length
+cm,espacer1,volu
+
+cmsel,s,wedge2
+allsel,below
+vsel,r,loc,z,coil_length-end_length,coil_length
+cm,espacer2,volu
+
+cmsel,s,wedge1
+allsel,below
+cmsel,u,espacer1
+cm,wedge1,volu
+
+cmsel,s,wedge2
+allsel,below
+cmsel,u,espacer2
+cm,wedge2,volu
+
+cmsel,s,espacer1
+cmsel,a,espacer2
+allsel,below
+cm,espacer,volu
+
+! each wedge
+csys,1
+
+cmsel,s,wedge1
+allsel,below
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+vsla,r
+cm,wedge11,volu
+
+cmsel,s,wedge1
+cmsel,u,wedge11
+allsel,below
+*get,tmax,kp,,mxloc,y
+ksel,r,loc,y,tmax
+lslk,r
+asll,r
+vsla,r
+cm,wedge12,volu
+
+cmsel,s,wedge1
+allsel,below
+cmsel,u,wedge11
+cmsel,u,wedge12
+cm,wedge13,volu
+
+csys,0
+finish
+save
+
+! ------------------------------------------------------
+! - Prestress parameters
+!interf_radial = 500e-6
+! ------------------------------------------------------
+/prep7
+/inp,B2pF-geometry-fillers,inp
+/inp,B2pF-geometry-nosycollar,inp
+/inp,B2pF-geometry-yoke,inp
+
+! ------------------------------------------------------
+allsel
+! ------------------------------------------------------
+! update the material
+! ------------------------------------------------------
+local,111,1,0,0,0,0,0,0
+
+! coil end
+!cmsel,s,coil
+!vsel,r,loc,z,coil_length-end_length,coil_length
+!allsel,below,volu
+!emodif,all,mat,mat_end
+
+! pole-tip - layer1
+cmsel,s,poletip1
+allsel,below,volu
+emodif,all,mat,mat_ti
+!emodif,all,mat,mat_g10
+!emodif,all,esys,111
+
+! pole-tip - layer2
+cmsel,s,poletip2
+allsel,below,volu
+emodif,all,mat,mat_ti
+!emodif,all,mat,mat_g10
+!emodif,all,esys,111
+
+! wedge - layer1
+cmsel,s,wedge1
+allsel,below,volu
+emodif,all,mat,mat_albr
+!emodif,all,esys,111
+
+! wedge - layer2
+cmsel,s,wedge2
+allsel,below,volu
+emodif,all,mat,mat_albr
+!emodif,all,esys,111
+
+! end spacer - layer1
+cmsel,s,espacer1
+allsel,below,volu
+*get,ivolu3,volu,,num,max
+vsel,u,,,ivolu3
+*get,ivolu2,volu,,num,max
+vsel,u,,,ivolu2
+*get,ivolu1,volu,,num,max
+vsel,u,,,ivolu1
+
+! end spacer - layer1 - #3
+vsel,s,,,ivolu3
+allsel,below,volu
+emodif,all,mat,mat_albr
+!emodif,all,mat,mat_g10
+!emodif,all,esys,111
+
+! end spacer - layer1 - #2
+vsel,s,,,ivolu2
+allsel,below,volu
+emodif,all,mat,mat_albr
+!emodif,all,mat,mat_g10
+!emodif,all,esys,111
+
+! end spacer - layer1 - #1
+vsel,s,,,ivolu1
+allsel,below,volu
+emodif,all,mat,mat_albr
+!emodif,all,mat,mat_g10
+!emodif,all,esys,111
+
+! end spacer - layer2
+cmsel,s,espacer2
+allsel,below,volu
+*get,ivolu3,volu,,num,max
+vsel,u,,,ivolu3
+*get,ivolu2,volu,,num,max
+vsel,u,,,ivolu2
+*get,ivolu1,volu,,num,max
+vsel,u,,,ivolu1
+
+! end spacer - layer2 - #3
+vsel,s,,,ivolu2
+allsel,below,volu
+emodif,all,mat,mat_albr
+!emodif,all,mat,mat_g10
+!emodif,all,esys,111
+
+! end spacer - layer2 - #2
+vsel,s,,,ivolu3
+allsel,below,volu
+emodif,all,mat,mat_albr
+!emodif,all,mat,mat_g10
+!emodif,all,esys,111
+
+! end spacer - layer2 - #1
+vsel,s,,,ivolu1
+allsel,below,volu
+emodif,all,mat,mat_albr
+!emodif,all,mat,mat_g10
+!emodif,all,esys,111
+
+! endshoe - layer1
+cmsel,s,endshoe1
+allsel,below,volu
+emodif,all,mat,mat_albr
+!emodif,all, mat,mat_g10
+!emodif,all,esys,111
+
+! endshoe - layer2
+cmsel,s,endshoe2
+allsel,below,volu
+emodif,all,mat,mat_albr
+!emodif,all, mat,mat_g10
+!emodif,all,esys,111
+
+allsel
+eplot
+
+! ------------------------------------------------------
+! - Contacts
+/inp,MGen_3D_mech_cont,inp
+/inp,MGen_3D_mech_cont_struct,inp
+! ------------------------------------------------------
+! ! Test for overlapping geo
+! /solu
+
+! csys,0
+! alls
+! nsel,r,loc,x,0
+! d,all,ux,0
+
+! alls
+! nsel,r,loc,y,0
+! d,all,uy,0
+
+! alls
+! nsel,r,loc,z,0
+! d,all,uz,0
+
+! cmsel,s,collar
+! alls,below,volu
+! nsel,r,loc,z,length
+! d,all,uz,1e-3
+
+! cmsel,s,end_plate
+! alls,below,volu
+! d,all,ux,0
+! d,all,uy,0
+! d,all,uz,0
+
+! alls
+! time,1
+! solve
+
+! /post1
+! alls
+! plnsol,u,z
+! ------------------------------------------------------
+! - Local ESYS - Coil - Move to 1 for 
+icsys = 10001
+
+! Layer 1
+*use,CoilEsysMacro_v2.mac,'coil11',icsys,0,0
+*use,CoilEsysMacro_v2.mac,'coil12',icsys,0,0
+*use,CoilEsysMacro_v2.mac,'coil13',icsys,0,0
+*use,CoilEsysMacro_v2.mac,'coil14',icsys,0,0
+
+! Layer 2
+*use,CoilEsysMacro_v2.mac,'coil21',icsys,0,0
+*use,CoilEsysMacro_v2.mac,'coil22',icsys,0,0
+*use,CoilEsysMacro_v2.mac,'coil23',icsys,0,0
+*use,CoilEsysMacro_v2.mac,'coil24',icsys,0,0
+! ------------------------------------------------------
+! does not work at the coil end
+!cmsel,s,coil12
+!allsel,below,volu
+!/input,MDP_ESYS_change.inp
+!allsel
+! ------------------------------------------------------
+! Write centroids
+/inp,Centroids,inp
+! ------------------------------------------------------
+! Refresh Opera Forces if Mesh Was Changed
+! No Iron
+! /sys,..\Opera\MGen_3D_Batch.bat
+! Iron
+! /sys,..\double_layer_final_iron_old_short_giorgio_for_ANSYS\Centroids_3D_Batch.bat
+
+! ------------------------------------------------------
+! - Boundary Conditions
+/inp,B2pF-mec-bc,inp
+! ------------------------------------------------------
+! /eof
+! ------------------------------------------------------
+! Solution
+/input,B2pF-mec-solution,inp
+! /input,check_axial_loading,inp
+! /eof
+! ------------------------------------------------------
+! - Post-processing
+/post1
+allsel
+
+/input,B2pF-mech-post  ,inp
+!/input,B2pF-mech-post2d,inp
+allsel
+! ------------------------------------------------------

@@ -1,0 +1,436 @@
+! ------------------------------------------------------
+! - Solution
+/solu
+tref,293
+! neqit,100
+nind = 0
+
+! use the tapered shim at the middle plane or not
+if_taper_shim = 1
+
+! bladder and key setup
+interf_hkey  =    0e-6
+interf_vkey  = 1000e-6
+
+! layer-1
+! endshoe shim is applied here to create the tapered shim
+midplane_shim11 = 150e-6
+midplane_shim12 =   0e-6
+pole_shim1      =   0e-6
+poletip_shim1   =   0e-6
+wedgefront_shim1=   0e-6
+wedgeback_shim1 =   0e-6
+coilfront_shim12=   0e-6
+coilfront_shim13=   0e-6
+coilfront_shim14=   0e-6
+coilback_shim11 =   0e-6
+coilback_shim12 =   0e-6
+coilback_shim13 =   0e-6
+coilback_shim14 =   0e-6
+! layer-2
+midplane_shim21 = 150e-6
+midplane_shim22 =   0e-6
+pole_shim2      =   0e-6
+poletip_shim2   =   0e-6
+wedgefront_shim2=   0e-6
+wedgeback_shim2 =   0e-6
+coilfront_shim22=   0e-6
+coilfront_shim23=   0e-6
+coilfront_shim24=   0e-6
+coilback_shim21 =   0e-6
+coilback_shim22 =   0e-6
+coilback_shim23 =   0e-6
+coilback_shim24 =   0e-6
+
+interf_eplate = 2800e-6
+
+! pole shim ramp size
+l_ramp =  80e-3
+
+! tapered middle plane shim
+! get the length of the end shoe
+cmsel,s,endshoe1
+cmsel,a,endshoe2
+allsel,below,volu
+*get,z0eshoe,kp,,mnloc,z
+*get,z1eshoe,kp,,mxloc,z
+
+cmsel,s,poletip1
+cmsel,a,poletip2
+allsel,below,volu
+*get,z1poletip,kp,,mxloc,z
+
+z0_mid = coil_length-end_length 
+z0_mid = z1poletip
+z1_mid = (z0eshoe+z1eshoe)*0.5
+z2_mid = z1eshoe
+
+! -----------------------------------------------
+! change the contact stiffness for coil - wedge, coil-pole
+! normal stiffness, kN = E / t
+fkn = -5e9/100e-6
+
+rmodif,20,1,fkn
+rmodif,21,1,fkn
+rmodif,22,1,fkn
+rmodif,23,1,fkn
+rmodif,24,1,fkn
+rmodif,26,1,fkn
+rmodif,27,1,fkn
+rmodif,28,1,fkn
+rmodif,29,1,fkn
+
+rmodif,80,1,fkn
+rmodif,81,1,fkn
+rmodif,82,1,fkn
+rmodif,83,1,fkn
+rmodif,84,1,fkn
+rmodif,86,1,fkn
+rmodif,87,1,fkn
+rmodif,88,1,fkn
+rmodif,89,1,fkn
+rmodif,90,1,fkn
+rmodif,91,1,fkn
+
+! delete the ux = 0 at the x = 0
+!cmsel,s,yoke
+!allsel,below,volu
+!nsel,r,loc,x,0
+!ddele,all
+!allsel
+
+! ----------------------------------------------
+! - Step 1 - Assembly with Interference
+! For the moment might be better on the filler 
+! as we need to separate pole ss/end contacts
+/title, Collaring
+nind = nind + 1
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! implement the ramp region of the pole shim
+!
+z1_ramp = coil_length-end_length
+z0_ramp = z1_ramp-l_ramp
+
+*DIM,noseShim1,table,4,1,,z
+*DIM,noseShim2,table,4,1,,z
+! z location
+noseShim1(1,0) = 0
+noseShim1(2,0) = z0_ramp
+noseShim1(3,0) = (z0_ramp+z1_ramp)*0.5
+noseShim1(4,0) = z1_ramp
+
+noseShim2(1,0) = 0
+noseShim2(2,0) = z0_ramp
+noseShim2(3,0) = (z0_ramp+z1_ramp)*0.5
+noseShim2(4,0) = z1_ramp
+! shim thickness 
+noseShim1(1,1) = pole_shim1
+noseShim1(2,1) = pole_shim1
+noseShim1(3,1) = 0.0
+noseShim1(4,1) = 0.0
+
+noseShim2(1,1) = pole_shim2
+noseShim2(2,1) = pole_shim2
+noseShim2(3,1) = 0.0
+noseShim2(4,1) = 0.0
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! tapered middle plane shim
+!!!
+! uniform middle plane shim
+*if,if_taper_shim,eq,0,then
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ ! layer-1
+ ! end shoe shim = shim thickness
+ cmsel,s,layer1
+ cmsel,a,interlay
+ allsel,below,volu
+ nsel,r,loc,y,-mesh_size/10,mesh_size/10
+ d,all,uy,midplane_shim11
+  
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ ! layer-2
+ ! end shoe shim = shim thickness
+ cmsel,s,layer2
+ cmsel,a,filler
+ allsel,below,volu
+ nsel,r,loc,y,-mesh_size/10,mesh_size/10
+ d,all,uy,midplane_shim21
+ 
+! tapered middle plane shim
+*else
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ ! layer-1
+ ! end shoe shim = shim thickness(z)
+ cmsel,s,layer1
+ cmsel,a,interlay
+ allsel,below,volu
+ nsel,r,loc,y,-mesh_size/10,mesh_size/10
+ 
+ ! total node number at the boundary
+ *get,nnode,node,,count
+ 
+ *do,i,1,nnode
+  ! get the minimum node id
+  *get,inode,node,,num,min
+  ! get the z location at this node
+  znode = nz(inode)
+
+  ! setup the displacement
+  ! uniform region
+  *if,znode,lt,z0_mid,then
+   d,inode,uy,midplane_shim11
+  ! tapered region
+  *elseif,znode,ge,z0_mid,and,znode,lt,z1_mid,then
+   d,inode,uy,midplane_shim11+(midplane_shim12-midplane_shim11)*(znode-z0_mid)/(z1_mid-z0_mid)
+  ! zero region
+  *else
+   d,inode,uy,midplane_shim12
+  *endif
+ 
+  ! remove the select node
+  nsel,u,,,inode
+*enddo
+
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ ! layer-2
+ ! end shoe shim = shim thickness(z)
+ cmsel,s,layer2
+ cmsel,a,filler
+ allsel,below,volu
+ nsel,r,loc,y,-mesh_size/10,mesh_size/10
+ 
+ ! total node number at the boundary
+ *get,nnode,node,,count
+ *do,i,1,nnode
+  ! get the minimum node id
+  *get,inode,node,,num,min
+  ! get the z location at this node
+  znode = nz(inode)
+
+  ! setup the displacement
+  ! uniform region
+  *if,znode,lt,z0_mid,then
+   d,inode,uy,midplane_shim21
+  ! tapered region
+  *elseif,znode,ge,z0_mid,and,znode,lt,z1_mid,then 
+   d,inode,uy,midplane_shim21+(midplane_shim22-midplane_shim21)*(znode-z0_mid)/(z1_mid-z0_mid)
+  ! zero region
+  *else
+   d,inode,uy,midplane_shim22
+  *endif
+ 
+  ! remove the select node
+  nsel,u,,,inode
+*enddo
+
+*endif
+
+! Pole Shim - Tabular
+! interf_pole = 500e-6
+! L_shim = 500e-3
+! *dim,pshim_profile,table,4,,,Z,,,0
+! *TAXIS,pshim_profile(1),1,0,L_shim,L_shim+1e-6,length
+! pshim_profile(1,1) = interf_pole, interf_pole, 0, 0
+
+! rmodif,23,10,%pshim_profile%
+! rmodif,24,10,%pshim_profile%
+
+! New strategy with just straight section
+! pole (straight section)
+rmodif,50,10,%noseShim1%
+rmodif,51,10,%noseShim1%
+rmodif,52,10,%noseShim2%
+rmodif,53,10,%noseShim2%
+! pole tip
+rmodif,26,10,poletip_shim1
+rmodif,86,10,poletip_shim2
+! coil wedge, front side (straight section)
+rmodif,20,10,wedgefront_shim1
+rmodif,80,10,wedgefront_shim2
+! coil wedge, back side (straight section)
+rmodif,21,10,wedgeback_shim1
+rmodif,81,10,wedgeback_shim2
+! coil-end spacer, back side
+rmodif,22,10,coilback_shim11
+rmodif,23,10,coilback_shim12
+rmodif,24,10,coilback_shim13
+rmodif,25,10,coilback_shim14
+rmodif,82,10,coilback_shim21
+rmodif,83,10,coilback_shim22
+rmodif,84,10,coilback_shim23
+rmodif,85,10,coilback_shim24
+! coil-end spacer, front side
+rmodif,27,10,coilfront_shim12
+rmodif,28,10,coilfront_shim13
+rmodif,29,10,coilfront_shim14
+rmodif,87,10,coilfront_shim22
+rmodif,88,10,coilfront_shim23
+rmodif,89,10,coilfront_shim24
+! kill the contact for end plate
+rmodif,40,10,-0.5e-3
+! kill the contact for the v-key and h-key
+rmodif,38,10,-1.0e-3 
+rmodif,39,10,-1.0e-3 
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! kill the yoke for Collaring
+! cmsel,s,yoke
+! cmsel,a,shell
+! cmsel,a,rod
+! cmsel,a,nut
+! cmsel,a,pad
+! cmsel,a,hkey
+! cmsel,a,vkey
+! cmsel,a,eplate
+! allsel,below,volu
+! ekill,all
+! ! fix the displacement for the killed elements
+! csys,0
+! nsel,u,loc,x,0
+! nsel,u,loc,y,0
+! nsel,u,loc,z,0
+! d,all,ux,0
+! d,all,uy,0
+! d,all,uz,0
+! ! negative contact between the yoke and collar
+! rmodif,33,10,-1.5e-3
+! rmodif,34,10,-1.5e-3
+
+alls
+deltim,0.2
+neqit,35
+time,nind
+solve
+
+! ! ----------------------------------------------
+! ! - Step 2 - yoke and shell assembly
+! /title, Structure assembly
+! nind = nind + 1
+
+! ! alive the yoke
+! cmsel,s,yoke
+! cmsel,a,shell
+! cmsel,a,rod
+! cmsel,a,nut
+! cmsel,a,pad
+! cmsel,a,hkey
+! cmsel,a,vkey
+! cmsel,a,eplate
+! allsel,below,volu
+! ealive,all
+! ! kill the constrains
+! csys,0
+! nsel,u,loc,x,0
+! nsel,u,loc,y,0
+! nsel,u,loc,z,0
+! ddele,all,ux
+! ddele,all,uy
+! ddele,all,uz
+! ! zero contact between the yoke and collar
+! rmodif,33,10,0
+! rmodif,34,10,0
+! ! zero contact between the end plate and end shoe
+! rmodif,40,10,0
+
+! alls
+! deltim,0.5
+! neqit,30
+! time,nind
+! solve
+
+! ----------------------------------------------
+! - Step 3 - Longitudinal Prestress
+/title, Axial loading 50percent
+nind = nind + 1
+!cmsel,s,eplate
+!alls,below,volu
+!asel,r,loc,z,length+teplate
+!nsla,r
+!sf,all,pres,plate_pres
+
+rmodif,40,10,interf_eplate*0.5
+
+alls
+time,nind
+deltim,0.5
+solve
+
+! - step 3 - bladder & key
+/title, Key insertion 10percent
+nind = nind + 1
+
+! horizontal key
+rmodif,38,10,interf_hkey*0.1
+! vertialca key
+rmodif,39,10,interf_vkey*0.1
+
+alls
+time,nind
+deltim,0.5
+solve
+
+! ----------------------------------------------
+! - Step 3 - Longitudinal Prestress
+/title, Axial loading 100percent
+nind = nind + 1
+!cmsel,s,eplate
+!alls,below,volu
+!asel,r,loc,z,length+teplate
+!nsla,r
+!sf,all,pres,plate_pres
+
+rmodif,40,10,interf_eplate
+
+alls
+time,nind
+deltim,0.5
+solve
+
+! - step 3 - bladder & key
+/title, Key insertion 100percent
+nind = nind + 1
+
+! horizontal key
+rmodif,38,10,interf_hkey
+! vertialca key
+rmodif,39,10,interf_vkey
+
+alls
+time,nind
+deltim,0.5
+solve
+
+! ------------------------
+! - Step 5 - Cooldown
+/title, Cool-Down
+nind = nind + 1
+alls
+bfunif,temp,4.5
+
+alls
+time,nind
+deltim,0.2
+neqit,35
+solve
+
+! ------------------------
+! - Step 6 - Powering
+/title, Powering
+nind = nind + 1
+
+! Apply e.m. forces
+allsel
+operaforces_cum,'centroids_opera_output','res'
+! fscale,(6.3/5)**2
+
+allsel
+time,nind
+deltim,0.2
+neqit,35
+solve
+! ------------------------
+! Store
+finish
+save

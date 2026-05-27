@@ -1,0 +1,14 @@
+! Extrude
+FINISH
+/CLEAR,START
+
+resume,geo,db
+
+/prep7
+! Scale model to m
+vlscale,all, , ,1e-3 ,1e-3,1e-3 , ,,1
+
+! Write centroids
+/inp,Centroids,inp
+
+! Write forces

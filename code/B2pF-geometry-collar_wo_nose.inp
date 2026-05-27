@@ -1,0 +1,439 @@
+! ------------------------------------------
+! - Collar Geometry with Nose
+! Three piece design with half modulus
+! and antisym condition on mid-plane
+! ------------------------------------------
+! resume,B2pF_3D,db ! For testing purposes
+! ------------------------------------------
+/prep7
+/inp,grab_nums,inp
+! ------------------------------------------
+! Get Pole Shapes
+csys,1
+
+cmsel,s,coil1
+alls,below,volu
+asel,r,loc,z,0
+alls,below,area
+ksel,r,loc,x,r11
+*get,y2,kp,,mxloc,y
+alls,below,area
+ksel,r,loc,x,r12
+*get,y3,kp,,mxloc,y
+
+cmsel,s,coil2
+alls,below,volu
+asel,r,loc,z,0
+alls,below,area
+ksel,r,loc,x,r21
+*get,y7,kp,,mxloc,y
+alls,below,area
+ksel,r,loc,x,r22
+*get,y8,kp,,mxloc,y
+! ------------------------------------------
+ksel,none
+lsel,none
+asel,none
+vsel,none
+! ------------------------------------------
+! Create Keypoints
+csys,1
+k,knum+1,r11,90,0
+k,knum+2,r11,y2,0
+k,knum+3,r12,y3,0
+k,knum+4,r12,90,0
+
+k,knum+5,r21,y3,0
+k,knum+6,r21,90,0
+k,knum+7,r21,y7,0
+k,knum+8,r22,y8,0
+k,knum+9,r22,90,0
+
+k,knum+10,r22+fillerth,y8,0
+k,knum+11,r22+fillerth,90,0
+
+! Lines
+csys,0
+l,knum+1,knum+4
+l,knum+2,knum+3
+l,knum+4,knum+6
+l,knum+3,knum+5
+l,knum+6,knum+9
+l,knum+7,knum+8
+l,knum+9,knum+11
+l,knum+8,knum+10
+
+csys,1
+l,knum+1,knum+2
+l,knum+3,knum+4
+l,knum+6,knum+5
+l,knum+5,knum+7
+l,knum+8,knum+9
+l,knum+10,knum+11
+
+! Areas
+asel,none
+a,knum+1,knum+2,knum+3,knum+4
+cm,a1,area
+asel,none
+a,knum+4,knum+3,knum+5,knum+6
+cm,a2,area
+asel,none
+a,knum+6,knum+5,knum+7,knum+8,knum+9
+cm,a3,area
+asel,none
+a,knum+9,knum+8,knum+10,knum+11
+cm,a4,area
+
+! Volume
+vsel,none
+!cmsel,s,a1  ! pole-1
+cmsel,a,a2
+!cmsel,a,a3  ! pole-2
+cmsel,a,a4
+vext,all, , , , ,coil_length-end_length
+!vatt,mat_n40_h
+vatt,mat_g10
+vsweep,all
+cm,pole_ins,volu
+
+
+! ! ------------------------------------------
+! ! - Duplicate for the filler lamination
+! cmsel,s,collar_nose_top
+! vgen,2,all, , , , , , , , 0
+! cmsel,u,collar_nose_top
+! cm,collar_nose_fil,volu
+! ! ------------------------------------------
+! ! Remove old straight section
+! cmsel,s,pole1
+! cmsel,a,pole2
+! alls,below,volu
+! asel,r,loc,z,0
+! vsla,r
+! alls,below,volu
+! vclear,all
+! vdele,all, , , 1
+! ! ------------------------------------------
+! alls
+! eplot
+
+! ------------------------------------------
+! Now the outside
+/inp,grab_nums,inp
+
+! Keypoints
+csys,1
+k,knum+1,rin_collar,0,0
+k,knum+2,OR_collar,0,0
+k,knum+3,OR_collar,90,0
+k,knum+4,rin_collar,90,0
+
+! Notch
+csys,1
+k,knum+5,OR_collar,t_notch2,0
+csys,0
+k,knum+6,OR_collar*cos(t_notch)-l_flat,OR_collar*sin(t_notch),0
+csys,1
+k,knum+7,OR_collar,t_notch,0
+
+! Special pole 2 match
+csys,1
+k,knum+8,rin_collar,y8,0
+
+! Lines
+csys,0
+l,knum+1,knum+2
+l,knum+5,knum+6
+l,knum+6,knum+7
+l,knum+3,knum+4
+
+csys,1
+l,knum+2,knum+7
+l,knum+5,knum+3
+l,knum+3,knum+5
+l,knum+4,knum+8
+l,knum+8,knum+1
+
+! Area
+al,all
+cm,collar_top,area
+
+! ------------------------------------------
+! - Filler lamination
+! ------------------------------------------
+! Init
+/inp,grab_nums,inp
+
+! Keypoints
+csys,1
+k,knum+1,rin_collar,t_collar_filler,0
+
+csys,0
+k,knum+2,rin_collar,rin_collar*sin(t_collar_filler),0
+k,knum+3,rin_collar,OR_collar*sin(t_end),0
+
+csys,1
+k,knum+4,OR_collar,t_end,0
+
+! Notch
+csys,1
+k,knum+5,OR_collar,t_notch2,0
+csys,0
+k,knum+6,OR_collar*cos(t_notch)-l_flat,OR_collar*sin(t_notch),0
+csys,1
+k,knum+7,OR_collar,t_notch,0
+
+! Nose
+k,knum+8,OR_collar,90,0
+k,knum+9,rin_collar,90,0
+
+! Extra Nose Match
+k,knum+10,rin_collar,y8,0
+
+! Lines
+csys,0
+l,knum+1,knum+2
+l,knum+2,knum+3
+l,knum+3,knum+4
+
+csys,1
+l,knum+4,knum+7
+
+csys,0
+l,knum+5,knum+6
+l,knum+6,knum+7
+l,knum+8,knum+9
+
+csys,1
+l,knum+5,knum+8
+l,knum+9,knum+10
+l,knum+10,knum+1
+
+! Area
+al,all
+cm,collar_fil,area
+! ---------------------------------
+! - Holes
+asel,none
+cyl4,r_collar_hole_pos*cos(t_collar_hole),r_collar_hole_pos*sin(t_collar_hole),r_collar_hole
+cm,collar_hole,area
+agen,2,all, , , , ,dz_collar
+cmsel,u,collar_hole
+cm,collar_hole_dz,area
+
+! Boolean collar top
+cmsel,s,collar_hole
+cmsel,a,collar_top
+asba,collar_top,collar_hole,,delete,delete
+cm,collar_top,area
+
+! Boolean collar filler
+cmsel,s,collar_hole_dz
+cmsel,a,collar_fil
+asba,collar_fil,collar_hole_dz,,delete,delete
+cm,collar_fil,area
+! -------------------------------------
+! - Bottom lamination
+! -------------------------------------
+! Init
+/inp,grab_nums,inp
+
+! Keypoints
+csys,1
+k,knum+1,rin_collar,0,dz_collar
+k,knum+2,OR_collar,0,dz_collar
+k,knum+3,OR_collar,t_end,dz_collar
+
+csys,0
+k,knum+4,rin_collar,OR_collar*sin(t_end),dz_collar
+
+! Lines
+csys,0
+l,knum+1,knum+2
+l,knum+3,knum+4
+l,knum+4,knum+1
+
+csys,1
+l,knum+2,knum+3
+
+! Area
+al,all
+cm,collar_bot,area
+! ---------------------------------
+! - Key Slots
+/inp,grab_nums,inp
+
+! Key - Top
+rectng,x_ckey,x_ckey+w_ckey,y_ckey,y_ckey+h_ckey
+cm,ckey,area
+agen,2,all, , , , ,dz_collar
+cmsel,u,ckey
+cm,ckey_dz,area
+
+! Cut Top Collar
+cmsel,s,collar_top
+cmsel,a,ckey
+asba,collar_top,ckey,,delete,keep
+cmsel,u,ckey
+cm,collar_top,area
+
+! Cut Bottom Collar
+cmsel,s,collar_bot
+cmsel,a,ckey_dz
+asba,collar_bot,ckey_dz,,delete,delete
+cm,collar_bot,area
+
+! Separate Key
+cmsel,s,ckey
+alls,below,area
+agen,2,all
+cm,atmp,area
+cmsel,u,ckey
+cm,ckey,area
+cmsel,s,atmp
+cmsel,u,ckey
+adele,all, , , 1
+! ---------------------------------
+! - Volumes
+! ---------------------------------
+! Extrude collar top straight
+vsel,none
+cmsel,s,collar_top
+vext,all, , , , ,coil_length-end_length
+!vatt,mat_n40_h
+vatt,mat_ss_h
+cm,collar_top,volu
+
+! Extrude collar top end
+cmsel,s,collar_top
+alls,below,volu
+asel,r,loc,z,coil_length-end_length
+vext,all, , , , , end_length + t_endspacers
+!vatt,mat_n40_h
+vatt,mat_ss_h
+cmsel,a,collar_top
+cm,collar_top,volu
+
+! fine mesh for the holes
+csys,0
+cmsel,s,collar_top
+allsel,below,volu
+lsel,r,loc,z,0
+lsel,r,loc,x,r_collar_hole_pos*cos(t_collar_hole)-r_collar_hole,r_collar_hole_pos*cos(t_collar_hole)+r_collar_hole
+lsel,r,loc,y,r_collar_hole_pos*sin(t_collar_hole)-r_collar_hole,r_collar_hole_pos*sin(t_collar_hole)+r_collar_hole
+lesize,all,2e-3
+csys,1
+
+esize,mesh_size*0.5
+cmsel,s,collar_top
+vsweep,all
+
+! Extrude collar fil straight
+vsel,none
+cmsel,s,collar_fil
+vext,all, , , , ,coil_length-end_length
+!vatt,mat_n40_h
+vatt,mat_ss_h
+cm,collar_fil,volu
+
+! Extrude collar fil end
+cmsel,s,collar_fil
+alls,below,volu
+asel,r,loc,z,coil_length-end_length
+vext,all, , , , , end_length + t_endspacers
+!vatt,mat_n40_h
+vatt,mat_ss_h
+cmsel,a,collar_fil
+cm,collar_fil,volu
+
+! fine mesh for the holes
+csys,0
+cmsel,s,collar_fil
+allsel,below,volu
+lsel,r,loc,z,0
+lsel,r,loc,x,r_collar_hole_pos*cos(t_collar_hole)-r_collar_hole,r_collar_hole_pos*cos(t_collar_hole)+r_collar_hole
+lsel,r,loc,y,r_collar_hole_pos*sin(t_collar_hole)-r_collar_hole,r_collar_hole_pos*sin(t_collar_hole)+r_collar_hole
+lesize,all,2e-3
+csys,1
+
+cmsel,s,collar_fil
+vsweep,all
+
+! Extrude collar bot straight
+vsel,none
+cmsel,s,collar_bot
+vext,all, , , , ,coil_length-end_length
+!vatt,mat_n40_h
+vatt,mat_ss_h
+cm,collar_bot,volu
+
+! Extrude collar bot end
+cmsel,s,collar_bot
+alls,below,volu
+asel,r,loc,z,coil_length-end_length
+vext,all, , , , , end_length + t_endspacers
+!vatt,mat_n40_h
+vatt,mat_ss_h
+cmsel,a,collar_bot
+cm,collar_bot,volu
+vsweep,all
+
+! Extrude key
+! fine mesh for the keys
+! vsel,none
+! cmsel,s,ckey
+! allsel,below
+! lsel,r,loc,z,0
+! lesize,all,1e-3
+
+vsel,none
+cmsel,s,ckey
+vext,all, , , , ,coil_length-end_length
+asel,r,loc,z,coil_length-end_length
+vext,all, , , , , end_length + t_endspacers
+vatt,mat_ss
+vsweep,all
+cm,ckey,volu
+! ------------------------------------------
+! Component Names
+cmsel,s,collar_top
+cmsel,a,collar_bot
+cmsel,a,collar_fil
+cm,collar,volu
+
+csys,1
+
+cmsel,s,pole_ins
+alls,below,volu
+asel,r,loc,x,r12,r21
+vsla,r,1
+cm,pole_inter,volu
+
+cmsel,s,pole_ins
+alls,below,volu
+asel,r,loc,x,r22+fillerth
+vsla,r
+cm,pole_filler,volu
+
+cmsel,s,pole_inter
+cmsel,a,interlay
+cm,ins1,volu
+
+cmsel,s,pole_filler
+cmsel,a,filler
+cm,ins2,volu
+
+! merge the insulation
+cmsel,s,pole_inter
+cmsel,a,interlay
+alls,below,volu
+nummrg,kp,1e-6
+
+cmsel,s,pole_filler
+cmsel,a,filler
+alls,below,volu
+nummrg,kp,1e-6
+
+alls
+! ------------------------------------------

@@ -1,0 +1,205 @@
+! - Create remaining geometry
+csys,1
+! Interlayer
+vsel,none
+rin = r12
+rou = r21
+
+k,,rin,0
+k1 = _return
+k,,rou,0
+k2 = _return
+k,,rou,90
+k3 = _return
+k,,rin,90
+k4 = _return
+
+l,k1,k2
+l,k2,k3
+l,k3,k4
+l,k4,k1
+
+a,k1,k2,k3,k4
+a1 = _return
+vext,a1, , , , , length
+cm,interlay,volu
+vatt,mat_g10
+esize,mesh_size/4
+vsweep,all
+
+! -----------------------
+! Parameters
+! Filler - Al Tube
+vsel,none
+csys,1
+rin = r22
+rou = r22+fillerth
+
+k,,rin,0
+k1 = _return
+k,,rou,0
+k2 = _return
+k,,rou,90
+k3 = _return
+k,,rin,90
+k4 = _return
+
+l,k1,k2
+l,k2,k3
+l,k3,k4
+l,k4,k1
+
+a,k1,k2,k3,k4
+a1 = _return
+vext,a1, , , , , length
+cm,filler,volu
+vatt,mat_g10
+esize,mesh_size
+vsweep,all
+
+! ! -----------------------
+! ! Mid-Plane Collar
+! vsel,none
+! csys,1
+! rin = r22+tfiller
+! rou = r22+tfiller+tcollar
+
+! k,,rin,0
+! k1 = _return
+! k,,rou,0
+! k2 = _return
+! k,,rou,acollar
+! k3 = _return
+! k,,rin,acollar
+! k4 = _return
+
+! l,k1,k2
+! l,k2,k3
+! l,k3,k4
+! l,k4,k1
+
+! a,k1,k2,k3,k4
+! a1 = _return
+! vext,a1, , , , , length
+! cm,mcollar,volu
+! vatt,mat_in
+! ! vatt,mat_al
+! esize,mesh_size
+! vsweep,all
+
+! ! -----------------------
+! ! Pole Collar
+! vsel,none
+! csys,1
+! rin = r22+tfiller
+! rou = r22+tfiller+tcollar
+
+! k,,rin,acollar
+! k1 = _return
+! k,,rou,acollar
+! k2 = _return
+! k,,rou,90
+! k3 = _return
+! k,,rin,90
+! k4 = _return
+
+! l,k1,k2
+! l,k2,k3
+! l,k3,k4
+! l,k4,k1
+
+! a,k1,k2,k3,k4
+! a1 = _return
+! vext,a1, , , , , length
+! cm,pcollar,volu
+! ! vatt,mat_albr
+! vatt,mat_al
+! esize,mesh_size
+! vsweep,all
+
+! ! -----------------------
+! ! Yoke
+! vsel,none
+! csys,1
+! rin = r22+tfiller+tcollar
+! rou = r22+tfiller+tcollar+tyoke
+
+! k,,rin,0
+! k1 = _return
+! k,,rou,0
+! k2 = _return
+! k,,rou,90
+! k3 = _return
+! k,,rin,90
+! k4 = _return
+
+! l,k1,k2
+! l,k2,k3
+! l,k3,k4
+! l,k4,k1
+
+! a,k1,k2,k3,k4
+! a1 = _return
+! vext,a1, , , , , length
+! cm,yoke,volu
+! vatt,mat_iron
+! esize,mesh_size_yoke
+! vsweep,all
+
+! -----------------------
+! ! Shell
+! vsel,none
+! csys,1
+! rin = r22+tfiller+tcollar+tyoke
+! rou = r22+tfiller+tcollar+tyoke+tshell
+
+! k,,rin,0
+! k1 = _return
+! k,,rou,0
+! k2 = _return
+! k,,rou,90
+! k3 = _return
+! k,,rin,90
+! k4 = _return
+
+! l,k1,k2
+! l,k2,k3
+! l,k3,k4
+! l,k4,k1
+
+! a,k1,k2,k3,k4
+! a1 = _return
+! vext,a1, , , , , length
+! cm,shell,volu
+! vatt,mat_al
+! esize,mesh_size_yoke
+! vsweep,all
+! ------------------------------
+! End System - Glued to mcollar
+vsel,none
+csys,1
+rin = r11
+rou = OR_collar
+
+k,,rin,0,length
+k1 = _return
+k,,rou,0,length
+k2 = _return
+k,,rou,90,length
+k3 = _return
+k,,rin,90,length
+k4 = _return
+
+l,k1,k2
+l,k2,k3
+l,k3,k4
+l,k4,k1
+
+a,k1,k2,k3,k4
+a1 = _return
+vext,a1, , , , , teplate
+cm,eplate,volu
+vatt,mat_ss
+esize,mesh_size
+vsweep,all
+! ------------------------------

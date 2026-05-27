@@ -1,0 +1,112 @@
+! Macro to select the side areas
+! *use,CoilContMacro.mac,v_name,aback_name,afront_name,sel_tol
+! Cycle to get the area on one side
+
+! ------------------------
+v_name 		= arg1
+aback_name 	= arg2
+afront_name = arg3
+sel_tol 	= arg4
+! ------------------------
+seltol,sel_tol
+
+! Get volume top and bot - Should do the same on other sides
+csys,1
+cmsel,s,v_name
+alls,below,volu
+*get,rin,kp,,mnloc,x
+*get,rou,kp,,mxloc,x
+
+*get,zin,kp,,mnloc,z
+*get,zou,kp,,mxloc,z
+
+! ---- Cycle
+asel,none
+cm,aback_name,area
+
+cmsel,s,v_name
+*get,Nw1,volu,,count
+
+csys,1
+
+*do,vv,1,Nw1
+	! Select missing wedges
+	cmsel,s,v_name
+	alls,below,volu
+	cmsel,u,aback_name
+	vsla,r,1
+	alls,below,volu
+
+	! Remove other areas
+	seltol,1e-6
+	asel,u,loc,x,rin
+	asel,u,loc,x,rou
+	seltol,sel_tol
+	asel,u,loc,y,90
+	asel,u,loc,z,zin
+
+	! Select extreme back area
+	alls,below,area
+	*get,zmax,kp,,mxloc,z
+	ksel,r,loc,z,zmax
+	lslk,r
+	asll,r
+	alls,below,area
+	cm,ktmp,kp
+	*get,zin1,kp,,mnloc,z
+
+	! Add all the touching areas
+	*get,acount_store,area,,count
+	check = 1
+	*dowhile,check
+		lslk,s
+		asll,s
+		seltol,1e-6
+		asel,u,loc,x,rin
+		asel,u,loc,x,rou
+		seltol,sel_tol
+		asel,u,loc,y,90
+		asel,u,loc,z,zin
+		alls,below,area
+		
+		! Check direction
+		ksel,u,loc,z,zin1,zou
+		cmsel,a,ktmp
+		lslk,r,1
+		asll,r,1
+
+		! Update check
+		alls,below,area
+		cm,ktmp,kp
+		*get,zin1,kp,,mnloc,z
+
+		! Check if this is the last area
+		*get,acount,area,,count
+		*if,acount,eq,acount_store,then
+			check = 0
+		*endif
+
+		acount_store = acount
+	*enddo
+
+	! Add selected areas to component
+	cmsel,a,aback_name
+	cm,aback_name,area
+*enddo
+cmdele,atmp
+cmdele,ktmp
+
+! Create Front Component
+cmsel,s,v_name
+alls,below,volu
+seltol,1e-6
+asel,u,loc,x,rin
+asel,u,loc,x,rou
+seltol,sel_tol
+asel,u,loc,y,90
+asel,u,loc,z,zin
+cmsel,u,aback_name
+cm,afront_name,area
+
+! Restore seltol
+seltol,

@@ -1,0 +1,272 @@
+! General Parameters
+
+! ! Units, references
+! /UNITS,SI
+! pi = acos(-1)
+! *afun,deg		 ! Specifies the units for angular functions in parameter expressions
+! tref,293 ! Declares the temperature of reference
+
+! ! Loads Values
+! temp_cd = 4.3				! Cool-Down Temperature
+
+! ! ------------------------------------------------------------------------------------------------------------------
+! ! - Coil Parameters, from Roxie:
+! !     1     1    13           60     0.483164            0         8498  EICLHCQ2K   2  14     0            0 
+! !     2     1     8           60      28.7236      19.2444         8498  EICLHCQ2K   2  14     0            0 
+! !     3     1     4           60      51.3031      57.4949         8498  EICLHCQ2K   2  14     0            0 
+! !     4     1     3           60       71.542      69.5369         8498  EICLHCQ2K   2  14     0            0 
+! !     5     1    22         76.1     0.483164            0         8498  EICLHCQ2K   2  14     0            0 
+! !     6     1    18         76.1      36.3531       46.016         8498  EICLHCQ2K   2  14     0            0 
+! !    no  type   nco       radius          phi        alpha      current   condname  n1  n2  imag         turn 
+! ! ------------------------------------------------------------------------------------------------------------------
+Nlayers      = 2
+Nlayer       = 2
+length       = 750e-3
+end_length   = 250e-3
+t_endspacers = 50e-3
+coil_length  = length - t_endspacers
+
+! Current
+current = -6040
+
+current1 = current
+current2 = current
+
+! Cable Parameters
+*set,w_cable1_bare, 15.100e-3
+*set,t_cable1_in_bare,1.79e-3
+*set,t_cable1_out_bare,2.01e-3
+alpha_ks1 = atan((t_cable1_out_bare-t_cable1_in_bare)/w_cable1_bare)
+
+*set,w_cable2_bare, 15.100e-3
+*set,t_cable2_in_bare,1.79e-3
+*set,t_cable2_out_bare,2.01e-3
+alpha_ks2 = atan((t_cable2_out_bare-t_cable2_in_bare)/w_cable2_bare)
+
+! Insulation
+*set,t_ins_r1,0.15e-3
+*set,t_ins_t1,0.120e-3
+
+*set,t_ins_r2,0.150e-3
+*set,t_ins_t2,0.120e-3
+
+! Insulated Cable
+w_cable1 = w_cable1_bare + 2*t_ins_r1
+t_cable1_in = t_cable1_in_bare + 2*t_ins_t1
+
+w_cable2 = w_cable2_bare + 2*t_ins_r2
+t_cable2_in = t_cable2_in_bare + 2*t_ins_t2
+
+! Coil Parameters
+! Radius
+*set,r11, 60.00e-3
+*set,r12, r11+w_cable1
+*set,r21, 76.1e-3
+*set,r22, r21+w_cable1
+
+*set,r1,r11
+*set,r3,r22
+*set,rout,r3
+
+! Roxie2Ansys Parameters
+file_name = './roxie'
+file_ext = 'cnc'
+
+coil_radius_str = 'coil_radius_arr'
+*dim,%coil_radius_str%,array,4
+
+%coil_radius_str%(1) = r11*1e3
+%coil_radius_str%(2) = r12*1e3
+%coil_radius_str%(3) = r21*1e3
+%coil_radius_str%(4) = r22*1e3
+
+! ! Interlayer
+! *set,t_ilay,r21-r12
+
+! ! Coil Data
+! *set,Nb1,4
+! *set,Nb2,2
+
+! ! Blocks Data
+! *set,Nc11,13
+! *set,Nc12,8
+! *set,Nc13,4
+! *set,Nc14,3
+! *set,Nc21,22
+! *set,Nc22,18
+
+! ! Set Block Angles
+! ! phi: Left corner position
+! ! alpha: bottom line inclination
+! *set,phi11,0.000
+! *set,phi12,28.7236
+! *set,phi13,51.3031
+! *set,phi14,71.542
+! *set,alpha11,0.000
+! *set,alpha12,19.2444
+! *set,alpha13,57.4949
+! *set,alpha14,69.5369
+
+! *set,phi21,0.000
+! *set,phi22,36.3531
+! *set,alpha21,0.000
+! *set,alpha22,46.016
+
+! ! ---- Filler
+! *set,fillerth,0.5e-3
+*set,fillerth,1.0e-3
+tfiller = fillerth
+*set,rin_collar,r3+fillerth
+
+! ! ---- Yoke
+rFe1 = 117.1e-3   ! rFe1-OR2 = 25.4 mm collar
+*set,rin_yoke,rFe1
+
+! ! ---- For Mechanics - Interlay Contact - Filler is Nlayers+1
+! ! Glue = 5 , Sliding = 0
+! ilay_12 = 0
+! ilay_23 = 0
+
+! ! -------------------------------------
+! ! Mesh Parameters
+! mpar = 1
+
+! mesh_azim_size 		= mpar*2e-3 	! Coil Azimuthal
+! mesh_radial_size 	= mpar*2e-3 	! Coil Radial
+
+! msize_aperture 		= mpar*1e-3
+! msize_filler 		= mpar*2e-3
+! msize_yoke 			= mpar*5e-3
+! msize_airfar		= mpar*20e-3
+
+mesh_size = 15e-3
+mesh_size_coil = 8e-3
+mesh_size_yoke = 2*mesh_size
+
+! !!!!!!!!!!!!!!!!!!!!!!!
+! ! Friction Parameters !
+! !!!!!!!!!!!!!!!!!!!!!!!
+! mu_single = 0.2
+! mu_g10_coil = mu_single
+! mu_ti_coil  = mu_single
+! mu_ti_g10   = mu_single
+! mu_g10_ss 	= mu_single
+! mu_alu_iron = mu_single
+! mu_ss_ss 	= mu_single
+! mu_ss_ti 	= mu_single
+! mu_ss_iron 	= mu_single
+
+mu_all = 0.2
+
+! ! ------------------------------------------------
+! ! - Structure parameters, will separate later
+! ! ------------------------------------------------
+! ! Pad
+! ! rFe1 = 117.1e-3   ! rFe1-OR2 = 25.4 mm collar
+OR_collar = rFe1
+yoke_gap = 2e-3
+
+pad_gap = 2e-3
+tpad = 50e-3
+tpad = 30e-3
+OR_yoke = 275e-3
+
+tshell = 19.05e-3   !3/4" shell
+OR_yoke = 620.0e-3/2.0-19.05e-3                   !work backwards from HiLumi (aluminum shell is 620, stainless is 630)
+
+OR_shell = OR_yoke+tshell
+
+! Iron Keys
+x_yvkey = 44e-3     ! x yoke vertical key
+y_yhkey = 44e-3
+! y_yhkey = 10e-3
+
+w_ykey  = 10e-3
+h_ykey  = 10e-3
+
+! Iron bladder slots
+w_tooth   = 10e-3
+w_bladder = 60e-3
+
+BeK_gap = 2e-3
+
+! Yoke Holes
+d_hex = 50e-3
+x_hex = (148.1+44.5)*1e-3
+
+d_h1 = 25e-3
+a_h1 = 19
+x_h1 = (205e-3)*cos(a_h1)
+y_h1 = (205e-3)*sin(a_h1)
+
+! Pad Holes
+d_h2 = 10e-3
+a_h2 = 19
+x_h2 = (132e-3)*cos(a_h2)
+y_h2 = (132e-3)*sin(a_h2)
+
+d_h3 = 10e-3
+a_h3 = 39
+x_h3 = (132e-3)*cos(a_h3)
+y_h3 = (132e-3)*sin(a_h3)
+
+! End Plate
+!*set,teplate,30e-3
+*set,teplate,50e-3
+
+! axial rod
+d_rod = 20e-3
+d_nut = 30e-3
+h_nut = 20e-3
+r_rod = OR_collar+35e-3
+t_rod = 45
+l_rod = length+h_nut+teplate+5e-3
+
+! ! --------------------------------------------------
+! ! - Air
+! rFe1air = 117.1e-3-10e-3   ! rFe1-OR2 = 25.4 mm collar
+! rFe2air = OR_yoke+10e-3
+! rAir = 750e-3
+
+! --------------------------------------------------
+! - Collar
+OR_collar = rin_yoke
+
+! Notch size
+t_notch   = 38
+l_flat    = 10e-3
+t_notch2   = acos(cos(t_notch)-l_flat/OR_collar)   !find 2nd angle using xback
+! dz_collar = 50e-3    ! For visualization purposes
+dz_collar = 0.0 ! Need to extrude now
+
+! Bottom parameters
+t_end = 35
+
+! Filler lamination
+t_collar_filler = 10
+
+! Rod-Hole
+r_collar_hole = 3e-3
+t_collar_hole = 70
+r_collar_hole_pos = (rin_collar+OR_collar)/2
+
+! Key slot
+w_ckey = 8e-3
+h_ckey = 8e-3
+x_ckey = rin_collar/2 + OR_collar/2 - w_ckey/2 - 2.5e-3
+y_ckey = 21.4e-3
+! --------------------------------------------------
+! - Shell
+! t_shell = 12.7e-3
+! ! --------------------------------------------------
+! ! - Loading parameters
+! interf_pole = 250e-6
+! interf_vkey = 0e-6
+! interf_hkey = 500e-6
+! --------------------------------------------------
+
+!OR_eplate = OR_shell
+w_eplate = OR_collar+tpad-h_ykey
+h_eplate = OR_collar+tpad-h_ykey
+rfillet_eplate = 20e-3
+! --------------------------------------------------

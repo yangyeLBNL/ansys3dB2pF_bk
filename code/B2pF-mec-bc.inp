@@ -1,0 +1,113 @@
+! ----------------------------------------------
+! - Boundary Conditions
+! ----------------------------------------------
+alls
+eplot
+! ----------------------------------------------
+! - Standard Symmetry
+alls
+csys,0
+cmsel,u,collar
+alls,below,volu
+nsel,r,loc,y,-mesh_size/100,mesh_size/100
+d,all,uy,0
+
+alls
+csys,0
+nsel,r,loc,x,-mesh_size/100,mesh_size/100
+d,all,ux,0
+
+csys,0
+nsel,s,loc,z,0
+d,all,uz,0
+
+! ----------------------------------------------
+! - Iron yoke
+! ----------------------------------------------
+! Horizontal splits
+!alls
+!cmsel,s,yoke
+!allsel,below,volu
+!nsel,r,loc,y,-mesh_size/100,mesh_size/100
+!ddele,all
+
+! ----------------------------------------------
+! - Keys
+! ----------------------------------------------
+! Collar
+csys,0
+cmsel,s,ckey
+alls,below,volu
+*get,ymin,kp,,mnloc,y
+cmsel,a,collar_top
+alls,below,volu
+nsel,r,loc,y,ymin
+cpintf,all,1e-6
+alls
+! ----------------------------------------------
+! - Collars
+! ----------------------------------------------
+! Lock collar holes (cp)
+local,11,1, r_collar_hole_pos*cos(t_collar_hole),r_collar_hole_pos*sin(t_collar_hole),0, 0,0,0,
+csys,11
+alls
+ksel,r,loc,x,0,r_collar_hole+1e-3
+lslk,s,0
+asll,s,1
+nsla,s,1
+cpintf,all,1e-6
+! ----------------------------------------------
+! Antisymmetry at Collar Mid-Plane
+! ux=ux, uy=-uy
+! ----------------------------------------------
+csys,0
+cmsel,s,collar_top
+alls,below,volu
+asel,r,loc,y,-mesh_size/100,mesh_size/100
+nsla,s,1
+*get,nnode1,node,num,count
+cm,node_top,node
+
+csys,0
+cmsel,s,collar_bot
+alls,below,volu
+asel,r,loc,y,-mesh_size/100,mesh_size/100
+nsla,s,1
+*get,nnode2,node,num,count
+cm,node_bot,node
+
+! Get numbers
+cmsel,s,node_top
+*dim,n1,array,nnode1
+*dim,x1,array,nnode1
+*dim,y1,array,nnode1
+*dim,z1,array,nnode1
+
+*do,ii,1,nnode1
+	*get,n1(ii),node,,num,min
+    *get,x1(ii),node,n1(ii),loc,x
+    *get,y1(ii),node,n1(ii),loc,y
+    *get,z1(ii),node,n1(ii),loc,z
+	nsel,u,node,,n1(ii)
+*enddo
+
+cmsel,s,node_bot
+*dim,n2,array,nnode1
+*do,ii,1,nnode1
+    n2(ii) = node(x1(ii),y1(ii),z1(ii))
+*enddo
+
+cmsel,s,node_top
+cmsel,a,node_bot
+*do,ii,1,nnode1	
+	ce, next, 0, n1(ii), uy, 1, n2(ii), uy, 1  ! Anti Sym
+	ce, next, 0, n1(ii), ux, 1, n2(ii), ux,-1  ! Sym
+    ce, next, 0, n1(ii), uz, 1, n2(ii), uz,-1  ! Sym
+*enddo
+! ----------------------------------------------
+! - Coil constraints - Removed / now contact
+! cmsel,s,coil
+! cmsel,a,wedge
+! alls,below,area
+! cpintf,all,1e-6
+! ----------------------------------------------

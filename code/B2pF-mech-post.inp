@@ -1,0 +1,838 @@
+! ---------------------------------------------
+! Post-Processing
+! ---------------------------------------------
+! Get peak strain/stress in the coil
+/post1
+allsel
+
+! Visualization options
+! Color Plot
+/PNUM,AREA,1
+/PNUM,VOLU,0
+/PNUM,NODE,0
+/PNUM,TABN,0
+/PNUM,SVAL,0
+/PNUM,DOMA,0
+/NUMBER,1   
+/PNUM,MAT,1 
+aplot
+
+! Contours
+/AUTO,1
+/DSCALE,1,OFF
+
+/PLOPTS,LOGO,1
+/PLOPTS,INFO,1
+/PLOPTS,LEG1,1
+/PLOPTS,LEG2,0
+/PLOPTS,LEG3,1
+/PLOPTS,FRAME,1
+/PLOPTS,TITLE,1
+/PLOPTS,MINM,1
+/PLOPTS,FILE,0
+/PLOPTS,WINS,1
+/PLOPTS,WP,0
+/PLOPTS,DATE,0
+/TRIAD,OFF
+
+/gfile,900
+
+/dev,font,1,Courier*New,400,0,-24,0,0,,,
+
+/RGB,INDEX,100,100,100, 0
+/RGB,INDEX, 80, 80, 80,13
+/RGB,INDEX, 60, 60, 60,14
+/RGB,INDEX, 0, 0, 0,15
+
+/view,1,-0.55,0.50,-0.70
+
+csys,0
+rsys,0
+
+! delete the figures
+db_name = 'B2pF_3D'
+/sys,del %db_name%*.png
+
+! record the maximum stress to file
+
+*cfopen,%db_name%_peak_stress,txt
+*vwrite,'step','part','smax'
+(1A5,1A10,1A10)
+
+! case loop
+*do,icase,1,nind
+
+  set,,,,,icase
+  
+  allsel
+  /auto,1
+  
+  ! total displacement
+  /show,png
+  plnsol,u,sum
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_usum_case%icase%,png
+  allsel
+  
+  ! coil contact pressure
+  cmsel,s,coil11
+  cmsel,a,coil21
+  allsel,below,volu
+  esel,a,type,,50,53
+  esel,a,type,,26
+  esel,a,type,,86
+  
+  /show,png
+  plnsol,cont,pres
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_coil2pole_contpres_case%icase%,png
+  
+  /show,png
+  plnsol,cont,sfric
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_coil2pole_sfric_case%icase%,png
+  
+  allsel
+  
+  ! coil end
+  cmsel,s,coil11
+  cmsel,a,coil21
+  vsel,r,loc,z,coil_length-end_length,coil_length
+  allsel,below
+  esel,a,type,,26
+  esel,a,type,,86
+  /auto,1
+  
+  /show,png
+  plnsol,cont,pres
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_coil2pole_es_contpres_case%icase%,png
+  
+  /show,png
+  plnsol,cont,sfric
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_coil2pole_es_sfric_case%icase%,png
+  
+  /show,png
+  plnsol,cont,gap
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_coil2pole_es_gap_case%icase%,png
+  
+  allsel
+  
+  ! contact at the cross section
+  cmsel,s,coil11
+  cmsel,a,coil21
+  allsel,below,volu
+  esel,s,type,,50,53
+  nsel,r,loc,z,0
+  esln,r
+  
+  /show,png
+  plnsol,cont,pres
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_pole_contpres2d_case%icase%,png
+  
+  /show,png
+  plnsol,cont,gap
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_pole_contgap2d_case%icase%,png
+  
+  allsel
+  
+  ! coil - wedge contact
+  cmsel,s,coil
+  vsel,r,loc,z,coil_length-end_length,coil_length
+  allsel,below,volu
+  esel,s,type,,22,25
+  esel,a,type,,82,85
+  /auto,1
+  
+  /show,png
+  plnsol,cont,pres
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_coil2wedge1_contpres_case%icase%,png
+  
+  /show,png
+  plnsol,cont,gap
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_coil2wedge1_contgap_case%icase%,png
+  
+  /show,png
+  plnsol,cont,sfric
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_coil2wedge1_sfric_case%icase%,png
+  
+  allsel
+  
+  ! coil - wedge contact
+  cmsel,s,coil
+  vsel,r,loc,z,coil_length-end_length,coil_length
+  allsel,below,volu
+  esel,s,type,,27,29
+  esel,a,type,,87,89
+  /auto,1
+  
+  /show,png
+  plnsol,cont,pres
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_coil2wedge2_contpres_case%icase%,png
+  
+  /show,png
+  plnsol,cont,gap
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_coil2wedge2_contgap_case%icase%,png
+  
+  /show,png
+  plnsol,cont,sfric
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_coil2wedge2_sfric_case%icase%,png
+  
+  allsel
+  
+  ! coil - collar-top
+  cmsel,s,layer2
+  allsel,below,volu
+  esel,a,type,,30
+  
+  /show,png
+  plnsol,cont,pres
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_coil2collarTop_contpres_case%icase%,png
+  
+  allsel
+  
+  ! coil - collar-fil
+  cmsel,s,layer2
+  allsel,below,volu
+  esel,a,type,,32
+  
+  /show,png
+  plnsol,cont,pres
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_coil2collarFil_contpres_case%icase%,png
+  
+  allsel
+  
+  ! coil equivalent stress
+  cmsel,s,coil
+  allsel,below,volu
+  
+  /show,png
+  plnsol,s,eqv
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_seqv_case%icase%,png
+  *get,s_coil,plnsol,0,max
+  
+  ! equivalent stress at end section
+  cmsel,s,coil
+  vsel,r,loc,z,coil_length-end_length,coil_length
+  allsel,below,volu
+  
+  /show,png
+  plnsol,s,eqv
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_seqv_es_case%icase%,png
+  
+  ! coil stress along the winding direction
+  cmsel,s,coil
+  allsel,below,volu
+  
+  rsys,solu
+  /show,png
+  plnsol,s,x
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_sz_case%icase%,png
+  
+  allsel
+
+  ! winding direction - end section
+  cmsel,s,coil
+  vsel,r,loc,z,coil_length-end_length,coil_length
+  allsel,below,volu
+  
+  rsys,solu
+  /show,png
+  plnsol,s,x
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_sz_es_case%icase%,png
+
+  allsel  
+  ! coil stress along the transverse direction
+  cmsel,s,coil
+  allsel,below,volu
+  
+  /show,png
+  plnsol,s,y
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_sx_case%icase%,png
+  
+  /show,png
+  plnsol,s,z
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_sy_case%icase%,png
+  
+  allsel
+  rsys,0
+  
+  ! wedge equivalent stress
+  cmsel,s,wedge1
+  cmsel,a,wedge2
+  cmsel,a,espacer1
+  cmsel,a,espacer2
+  allsel,below,volu
+  
+  /show,png
+  plnsol,s,eqv
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_wedge_seqv_case%icase%,png
+  *get,s_wedge,plnsol,0,max
+  
+  allsel
+  
+  ! pole tip
+  cmsel,s,poletip1
+  cmsel,a,poletip2
+  allsel,below,volu
+
+  /show,png
+  plnsol,s,eqv
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_poletip_seqv_case%icase%,png
+  *get,s_poletip,plnsol,0,max
+  
+  allsel
+  
+  ! endshoe
+  cmsel,s,endshoe1
+  cmsel,a,endshoe2
+  allsel,below,volu
+  
+  /show,png
+  plnsol,s,eqv
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_endshoe_seqv_case%icase%,png
+  *get,s_endshoe,plnsol,0,max
+  
+  allsel
+  
+  ! end plate
+  cmsel,s,eplate
+  allsel,below,volu
+  
+  /show,png
+  plnsol,s,eqv
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_endplate_seqv_case%icase%,png
+  *get,s_endplate,plnsol,0,max
+  
+  allsel
+  
+  ! collar-top
+  cmsel,s,collar_top
+  cmsel,a,collar_nose_top
+  allsel,below,volu
+  
+  /show,png
+  plnsol,s,eqv
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_collartop_seqv_case%icase%,png
+  *get,s_collar1,plnsol,0,max
+
+  allsel
+  
+  ! collar-bottom
+  cmsel,s,collar_bot
+  allsel,below,volu
+  
+  /show,png
+  plnsol,s,eqv
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_collarbot_seqv_case%icase%,png
+  *get,s_collar2,plnsol,0,max
+
+  allsel
+  
+  ! collar-bottom
+  cmsel,s,collar_fil
+  cmsel,a,collar_nose_fil
+  allsel,below,volu
+  
+  /show,png
+  plnsol,s,eqv
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_collarfil_seqv_case%icase%,png
+  *get,s_collar3,plnsol,0,max
+
+  allsel
+
+  ! collar key
+  cmsel,s,ckey
+  allsel,below,volu
+  
+  /show,png
+  plnsol,s,eqv
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_ckey_seqv_case%icase%,png
+  *get,s_ckey,plnsol,0,max
+  
+  ! record the peak stress
+  *vwrite,icase,'coil'     ,s_coil*1e-6
+(1F5.0,1A10,1F10.1)
+  *vwrite,icase,'wedge'    ,s_wedge*1e-6
+(1F5.0,1A10,1F10.1)
+  *vwrite,icase,'pole tip' ,s_poletip*1e-6
+(1F5.0,1A10,1F10.1)
+  *vwrite,icase,'end shoe' ,s_endshoe*1e-6
+(1F5.0,1A10,1F10.1)
+  *vwrite,icase,'endplate' ,s_endplate*1e-6
+(1F5.0,1A10,1F10.1)
+  *vwrite,icase,'collar-t' ,s_collar1*1e-6
+(1F5.0,1A10,1F10.1)
+  *vwrite,icase,'collar-b' ,s_collar2*1e-6
+(1F5.0,1A10,1F10.1)
+  *vwrite,icase,'ckey'     ,s_ckey*1e-6
+(1F5.0,1A10,1F10.1)
+  *vwrite,
+('')
+
+*enddo
+*cfclos
+
+! check the conductor inward displacement
+allsel
+cmsel,s,coil
+allsel,below
+*get,nsteps,active,,set,nset
+set,nsteps-1
+lcdef,1,nsteps-1
+set,nsteps
+lcoper,sub,1
+rsys,1
+
+/show,png
+plnsol,u,x
+/show,close
+/rename,%db_name%000,png,,%db_name%_coil_dux,png
+
+! check the force balance at the z = 0 plane
+*cfopen,%db_name%_force,txt
+*vwrite,
+('force balance at z = 0 plane')
+*vwrite,'step','coil','ins','wedge','collar','ckey','yoke','shell','rod','total'
+(1A5,9A10)
+
+rsys,0
+
+! case loop
+*do,icase,1,nind
+ set,icase
+ 
+ ! coil
+ cmsel,s,coil
+ allsel,below
+ nsel,r,loc,z,0
+ fsum,rsys
+ *get,fz_coil,fsum,,item,fz
+ 
+ ! insulation
+ cmsel,s,interlay
+ cmsel,a,filler
+ allsel,below
+ nsel,r,loc,z,0
+ fsum,rsys
+ *get,fz_ins,fsum,,item,fz
+ 
+ ! wedge
+ cmsel,s,wedge1
+ cmsel,a,wedge2
+ cmsel,a,espacer1
+ cmsel,a,espacer2
+ allsel,below
+ nsel,r,loc,z,0
+ fsum,rsys
+ *get,fz_wedge,fsum,,item,fz
+ 
+ ! collar
+ cmsel,s,collar
+ allsel,below
+ nsel,r,loc,z,0
+ fsum,rsys
+ *get,fz_collar,fsum,,item,fz
+ 
+ ! collar key
+ cmsel,s,ckey
+ allsel,below
+ nsel,r,loc,z,0
+ fsum,rsys
+ *get,fz_ckey,fsum,,item,fz
+ 
+ ! yoke
+ cmsel,s,yoke
+ cmsel,a,pad
+ cmsel,a,hkey
+ cmsel,a,vkey
+ allsel,below
+ nsel,r,loc,z,0
+ fsum,rsys
+ *get,fz_yoke,fsum,,item,fz
+ 
+ ! shell
+ cmsel,s,shell
+ allsel,below
+ nsel,r,loc,z,0
+ fsum,rsys
+ *get,fz_shell,fsum,,item,fz
+ 
+ fz_rod=0
+ *if,OR_shell,ne,OR_eplate,then
+  cmsel,s,rod
+  allsel,below
+  nsel,r,loc,z,0
+  fsum,rsys
+  *get,fz_rod,fsum,,item,fz
+ *endif
+ 
+ ! total
+ fztot = fz_coil+fz_ins+fz_wedge+fz_collar+fz_ckey+fz_yoke+fz_shell+fz_rod
+ 
+*vwrite,icase,fz_coil*1e-3,fz_ins*1e-3,fz_wedge*1e-3,fz_collar*1e-3,fz_ckey*1e-3,fz_yoke*1e-3,fz_shell*1e-3,fz_rod*1e-3,fztot*1e-3
+(1F5.0,9F10.1) 
+*enddo
+
+! check the force balance at the x = 0 plane (symmetrical plane)
+*vwrite,
+('force balance at x = 0 plane')
+*vwrite,'step','coil','ins','wedge','poletip','eshoe','collar','eplate','yoke','shell','total'
+(1A5,10A10)
+
+rsys,0
+
+! case loop
+*do,icase,1,nind
+ set,icase
+ 
+ ! coil
+ cmsel,s,coil
+ allsel,below
+ nsel,r,loc,x,0
+ fsum,rsys
+ *get,fx_coil,fsum,,item,fx
+ 
+ ! insulation
+ cmsel,s,interlay
+ cmsel,a,filler
+ allsel,below
+ nsel,r,loc,x,0
+ fsum,rsys
+ *get,fx_ins,fsum,,item,fx
+ 
+ ! wedge
+ cmsel,s,wedge1
+ cmsel,a,wedge2
+ cmsel,a,espacer1
+ cmsel,a,espacer2
+ allsel,below
+ nsel,r,loc,x,0
+ fsum,rsys
+ *get,fx_wedge,fsum,,item,fx
+ 
+ ! collar
+ cmsel,s,collar
+ allsel,below
+ nsel,r,loc,x,0
+ fsum,rsys
+ *get,fx_collar,fsum,,item,fx
+ 
+ ! pole tip
+ cmsel,s,poletip1
+ cmsel,a,poletip2
+ allsel,below
+ nsel,r,loc,x,0
+ fsum,rsys
+ *get,fx_pole,fsum,,item,fx
+ 
+ ! end shoe
+ cmsel,s,endshoe1
+ cmsel,a,endshoe2
+ allsel,below
+ nsel,r,loc,x,0
+ fsum,rsys
+ *get,fx_eshoe,fsum,,item,fx
+ 
+ ! end plate
+ cmsel,s,eplate
+ allsel,below
+ nsel,r,loc,x,0
+ fsum,rsys
+ *get,fx_eplate,fsum,,item,fx
+ 
+ ! yoke
+ cmsel,s,yoke
+ cmsel,a,pad
+ cmsel,a,hkey
+ cmsel,a,vkey
+ allsel,below
+ nsel,r,loc,x,0
+ fsum,rsys
+ *get,fx_yoke,fsum,,item,fx
+ 
+ ! shell
+ cmsel,s,shell
+ allsel,below
+ nsel,r,loc,x,0
+ fsum,rsys
+ *get,fx_shell,fsum,,item,fx
+ 
+ ! total
+ fxtot = fx_coil+fx_ins+fx_wedge+fx_collar+fx_pole+fx_eshoe+fx_eplate+fx_yoke+fx_shell
+ 
+*vwrite,icase,fx_coil*1e-3,fx_ins*1e-3,fx_wedge*1e-3,fx_pole*1e-3,fx_eshoe*1e-3,fx_collar*1e-3,fx_eplate*1e-3,fx_yoke*1e-3,fx_shell*1e-3,fxtot*1e-3
+(1F5.0,10F10.1) 
+*enddo
+
+! check the force balance at the y = 0 plane (symmetrical plane)
+*vwrite,
+('force balance at y = 0 plane')
+*vwrite,'step','coil','ins','eshoe','collar','eplate','yoke','shell','total'
+(1A5,8A10)
+
+rsys,0
+
+! case loop
+*do,icase,1,nind
+ set,icase
+ 
+ ! coil
+ cmsel,s,coil
+ allsel,below
+ nsel,r,loc,y,0
+ fsum,rsys
+ *get,fy_coil,fsum,,item,fy
+ 
+ ! insulation
+ cmsel,s,interlay
+ cmsel,a,filler
+ allsel,below
+ nsel,r,loc,y,0
+ fsum,rsys
+ *get,fy_ins,fsum,,item,fy
+ 
+ ! collar
+ cmsel,s,collar
+ allsel,below
+ nsel,r,loc,y,0
+ fsum,rsys
+ *get,fy_collar,fsum,,item,fy
+ 
+ ! end shoe
+ cmsel,s,endshoe1
+ cmsel,a,endshoe2
+ allsel,below
+ nsel,r,loc,y,0
+ fsum,rsys
+ *get,fy_eshoe,fsum,,item,fy
+ 
+ ! end plate
+ cmsel,s,eplate
+ allsel,below
+ nsel,r,loc,y,0
+ fsum,rsys
+ *get,fy_eplate,fsum,,item,fy
+ 
+ ! yoke
+ cmsel,s,yoke
+ cmsel,a,pad
+ cmsel,a,hkey
+ cmsel,a,vkey
+ allsel,below
+ nsel,r,loc,y,0
+ fsum,rsys
+ *get,fy_yoke,fsum,,item,fy
+ 
+ ! shell
+ cmsel,s,shell
+ allsel,below
+ nsel,r,loc,y,0
+ fsum,rsys
+ *get,fy_shell,fsum,,item,fy
+ 
+ ! total
+ fytot = fy_coil+fy_ins+fy_collar+fy_eshoe+fy_eplate+fy_yoke+fy_shell
+ 
+*vwrite,icase,fy_coil*1e-3,fy_ins*1e-3,fy_eshoe*1e-3,fy_collar*1e-3,fy_eplate*1e-3,fy_yoke*1e-3,fy_shell*1e-3,fytot*1e-3
+(1F5.0,8F10.1) 
+*enddo
+
+! check the force at the end section
+*vwrite,
+('check the axial force going through the coil and pole')
+*vwrite,'step','coil','poletip'
+(3A10)
+
+*do,icase,1,nind
+ set,icase
+ 
+ ! coil
+ cmsel,s,coil
+ allsel,below
+ nsel,r,loc,z,coil_length-end_length
+ fsum,rsys
+ *get,fz_cend,fsum,,item,fz
+ 
+ ! pole-tip
+ cmsel,s,poletip1
+ cmsel,a,poletip2
+ allsel,below
+ nsel,r,loc,z,coil_length-end_length
+ fsum,rsys
+ *get,fz_pend,fsum,,item,fz
+ 
+ *vwrite,icase,fz_cend,fz_pend
+(3F10.1)
+*enddo
+
+*cfclos
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! check the peak stress in the coil
+!
+! check the force balance at the z = 0 plane
+*cfopen,%db_name%_scoil_max,txt
+*vwrite,
+('maximum equivalent stress')
+*vwrite,'step','coil11','coil12','coil13','coil14','coil21','coil22','coil23','coil24'
+(1A5,8A10)
+
+rsys,0
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! equivalent stress
+*do,icase,1,nind
+ set,icase
+ 
+ *do,i,1,2
+  *do,j,1,4
+   cmsel,s,coil%i%%j%
+   vsel,r,loc,z,coil_length-end_length,coil_length
+   allsel,below
+   plnsol,s,eqv
+   *get,s%i%%j%_max,plnsol,0,max
+  *enddo
+ *enddo
+ 
+*vwrite,icase,s11_max*1e-6,s12_max*1e-6,s13_max*1e-6,s14_max*1e-6,s21_max*1e-6,s22_max*1e-6,s23_max*1e-6,s24_max*1e-6
+(1F5.0,8F10.1) 
+*enddo
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! azimuthal stress minimum
+*vwrite,
+('minimum azimthual stress')
+*vwrite,'step','coil11','coil12','coil13','coil14','coil21','coil22','coil23','coil24'
+(1A5,8A10)
+
+rsys,1
+
+! case loop
+*do,icase,1,nind
+ set,icase
+
+ *do,i,1,2
+  *do,j,1,4
+   cmsel,s,coil%i%%j%
+   vsel,r,loc,z,coil_length-end_length,coil_length
+   allsel,below
+   plnsol,s,y
+   *get,s%i%%j%_max,plnsol,0,min
+  *enddo
+ *enddo
+ 
+*vwrite,icase,s11_max*1e-6,s12_max*1e-6,s13_max*1e-6,s14_max*1e-6,s21_max*1e-6,s22_max*1e-6,s23_max*1e-6,s24_max*1e-6
+(1F5.0,8F10.1) 
+*enddo
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! azimuthal stress maximum
+*vwrite,
+('maximum azimthual stress')
+*vwrite,'step','coil11','coil12','coil13','coil14','coil21','coil22','coil23','coil24'
+(1A5,8A10)
+
+rsys,1
+
+! case loop
+*do,icase,1,nind
+ set,icase
+ 
+ *do,i,1,2
+  *do,j,1,4
+   cmsel,s,coil%i%%j%
+   vsel,r,loc,z,coil_length-end_length,coil_length
+   allsel,below
+   plnsol,s,y
+   *get,s%i%%j%_max,plnsol,0,max
+  *enddo
+ *enddo
+ 
+*vwrite,icase,s11_max*1e-6,s12_max*1e-6,s13_max*1e-6,s14_max*1e-6,s21_max*1e-6,s22_max*1e-6,s23_max*1e-6,s24_max*1e-6
+(1F5.0,8F10.1) 
+*enddo
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! axial stress minimum
+*vwrite,
+('minimum axial stress')
+*vwrite,'step','coil11','coil12','coil13','coil14','coil21','coil22','coil23','coil24'
+(1A5,8A10)
+
+rsys,1
+
+! case loop
+*do,icase,1,nind
+ set,icase
+
+ *do,i,1,2
+  *do,j,1,4
+   cmsel,s,coil%i%%j%
+   vsel,r,loc,z,coil_length-end_length,coil_length
+   allsel,below
+   plnsol,s,z
+   *get,s%i%%j%_max,plnsol,0,min
+  *enddo
+ *enddo
+ 
+*vwrite,icase,s11_max*1e-6,s12_max*1e-6,s13_max*1e-6,s14_max*1e-6,s21_max*1e-6,s22_max*1e-6,s23_max*1e-6,s24_max*1e-6
+(1F5.0,8F10.1) 
+*enddo
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! axial stress maximum
+*vwrite,
+('maximum azimthual stress')
+*vwrite,'step','coil11','coil12','coil13','coil14','coil21','coil22','coil23','coil24'
+(1A5,8A10)
+
+rsys,1
+
+! case loop
+*do,icase,1,nind
+ set,icase
+ 
+ *do,i,1,2
+  *do,j,1,4
+   cmsel,s,coil%i%%j%
+   vsel,r,loc,z,coil_length-end_length,coil_length
+   allsel,below
+   plnsol,s,z
+   *get,s%i%%j%_max,plnsol,0,max
+  *enddo
+ *enddo
+ 
+*vwrite,icase,s11_max*1e-6,s12_max*1e-6,s13_max*1e-6,s14_max*1e-6,s21_max*1e-6,s22_max*1e-6,s23_max*1e-6,s24_max*1e-6
+(1F5.0,8F10.1) 
+*enddo
+
+*cfclos
+
+/eof
