@@ -476,7 +476,7 @@ csys,1
  asel,r,loc,x,r21
  allsel,below,area
  *get,narea,area,0,count
- *if,narea,eq,1,then
+ *if,narea,eq,2,then
   cm,tmp,area
  *else
   ksel,r,loc,z,0
@@ -505,7 +505,7 @@ csys,1
  
  ! front side
  cmsel,s,acoil2%i%_all
- allsel,below
+ allsel,below,area
  ksel,r,loc,z,0
  *get,ymax,kp,,mxloc,y
  cmsel,s,acoil2%i%_all
@@ -525,10 +525,10 @@ csys,1
 
  !! when I remove the r21 for the coil23, the coil end region is also removed
  !! implement this to solve this issue
-cmsel,s,acoil23_back
-allsel,below,area
-asel,u,loc,x,r21
-cm,acoil2%i%_back,area
+!cmsel,s,acoil23_back
+!allsel,below,area
+!asel,u,loc,x,r21
+!cm,acoil2%i%_back,area
  !ksel,r,loc,z,0
  !*get,ymax,kp,,mxloc,y
  !cmsel,s,acoil2%i%_back

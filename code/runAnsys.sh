@@ -12,10 +12,10 @@
 #SBATCH --account=ac_magnet
 #
 # Nodes:
-#SBATCH --nodes=4
+#SBATCH --nodes=6
 #
 # Processors
-#SBATCH --ntasks-per-node=8
+#SBATCH --ntasks-per-node=6
 #
 # Memory: - 0 special command to get all the mem on each node
 ##SBATCH --mem=0

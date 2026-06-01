@@ -67,7 +67,7 @@ The collar is laminated and it has very low longitudinal modulus. We assume the 
 |39          |139        |vertical key                     |iron yoke                  |frictional|
 |40          |140        |end plate                        |end shoe                   |frictional|
 |42          |142        |end plate                        |iron yoke                  |frictional|
-|43          |143        |end plate                        |axial rod                  |frictional|
+|43          |143        |end plate                        |axial rod                  |bonded    |
 |44          |144        |axial rod                        |nut                        |bonded    |
 |50          |150        |coil (layer-1)                   |nose top                   |frictional|
 |51          |151        |coil (layer-1)                   |nose bot                   |frictional|
@@ -103,9 +103,9 @@ u_{y} (z) =
  u_{y,1},                                              & z_{1} < z \le z_{2} 
 \end{cases} 
 $$
-- $z_{0}$, `z1poletip`
+- $z_{0}$, `coil_length-end_length`
     - maximum pole tip position
-- $z_{1}$, `(z0eshoe+z1eshoe)*0.5` 
+- $z_{1}$, `z0eshoe` 
     - in the middle of the end shoe
 - $z_{2}$, `z1eshoe`
     - maximum end shoe position
@@ -113,6 +113,10 @@ $$
 The pole shim also has the ramp region. Need to determine the ramp region from the end of the straight section, `l_ramp`. 
 
 ## case study
-| case         | description |
-|--------------|-------------|
-| case0        | Gorigio's setup (hkey, 0mm; vkey, 1mm; mid shim1, 0,15mm; mid shim2, 0.15mm) |
+| case       | collar gap | mid shim      | hkey  | vkey  | axial interf | note       |
+|------------|------------|---------------|-------|-------|--------------|------------|
+| case0      | 0.5mm      | 0.15mm/0.15mm | 0.0mm | 1.0mm | 2.5mm        |            |
+| case1      | 0.1mm      | 0.40mm/0.60mm | 0.1mm | 0.3mm | 2.5mm        |            |
+| case2      | 0.5mm      | 0.40mm/0.60mm | 0.1mm | 0.3mm | 2.5mm        |            |
+| case3      | 0.5mm      | 0.40mm/0.60mm | 0.1mm | 0.3mm | 2.5mm        | al shell   |
+| case4      | 0.5mm      | 0.40mm/0.60mm | 0.1mm | 0.3mm | 2.5mm        | ss rod     |

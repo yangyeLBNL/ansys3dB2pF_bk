@@ -9,12 +9,12 @@ nind = 0
 if_taper_shim = 1
 
 ! bladder and key setup
-interf_hkey  =    0e-6
-interf_vkey  = 1000e-6
+interf_hkey  = 100e-6
+interf_vkey  = 300e-6
 
 ! layer-1
 ! endshoe shim is applied here to create the tapered shim
-midplane_shim11 = 150e-6
+midplane_shim11 = 400e-6
 midplane_shim12 =   0e-6
 pole_shim1      =   0e-6
 poletip_shim1   =   0e-6
@@ -28,7 +28,7 @@ coilback_shim12 =   0e-6
 coilback_shim13 =   0e-6
 coilback_shim14 =   0e-6
 ! layer-2
-midplane_shim21 = 150e-6
+midplane_shim21 = 600e-6
 midplane_shim22 =   0e-6
 pole_shim2      =   0e-6
 poletip_shim2   =   0e-6
@@ -42,7 +42,11 @@ coilback_shim22 =   0e-6
 coilback_shim23 =   0e-6
 coilback_shim24 =   0e-6
 
-interf_eplate = 2800e-6
+! gap between two collar pair
+gap_collar      = -0.1e-3
+
+! axial loading
+interf_eplate = 2500e-6
 
 ! pole shim ramp size
 l_ramp =  80e-3
@@ -61,36 +65,37 @@ allsel,below,volu
 *get,z1poletip,kp,,mxloc,z
 
 z0_mid = coil_length-end_length 
-z0_mid = z1poletip
+!z0_mid = z1poletip
 z1_mid = (z0eshoe+z1eshoe)*0.5
+z1_mid = z0eshoe
 z2_mid = z1eshoe
 
 ! -----------------------------------------------
 ! change the contact stiffness for coil - wedge, coil-pole
 ! normal stiffness, kN = E / t
-fkn = -5e9/100e-6
+!fkn = -5e9/100e-6
 
-rmodif,20,1,fkn
-rmodif,21,1,fkn
-rmodif,22,1,fkn
-rmodif,23,1,fkn
-rmodif,24,1,fkn
-rmodif,26,1,fkn
-rmodif,27,1,fkn
-rmodif,28,1,fkn
-rmodif,29,1,fkn
+!rmodif,20,1,fkn
+!rmodif,21,1,fkn
+!rmodif,22,1,fkn
+!rmodif,23,1,fkn
+!rmodif,24,1,fkn
+!rmodif,26,1,fkn
+!rmodif,27,1,fkn
+!rmodif,28,1,fkn
+!rmodif,29,1,fkn
 
-rmodif,80,1,fkn
-rmodif,81,1,fkn
-rmodif,82,1,fkn
-rmodif,83,1,fkn
-rmodif,84,1,fkn
-rmodif,86,1,fkn
-rmodif,87,1,fkn
-rmodif,88,1,fkn
-rmodif,89,1,fkn
-rmodif,90,1,fkn
-rmodif,91,1,fkn
+!rmodif,80,1,fkn
+!rmodif,81,1,fkn
+!rmodif,82,1,fkn
+!rmodif,83,1,fkn
+!rmodif,84,1,fkn
+!rmodif,86,1,fkn
+!rmodif,87,1,fkn
+!rmodif,88,1,fkn
+!rmodif,89,1,fkn
+!rmodif,90,1,fkn
+!rmodif,91,1,fkn
 
 ! delete the ux = 0 at the x = 0
 !cmsel,s,yoke
@@ -100,10 +105,9 @@ rmodif,91,1,fkn
 !allsel
 
 ! ----------------------------------------------
-! - Step 1 - Assembly with Interference
-! For the moment might be better on the filler 
-! as we need to separate pole ss/end contacts
-/title, Collaring
+! - Step 1 - Lock the pad
+! remove the assemly with the azimuthal interference to improve the convergence
+/title, Locking the pad
 nind = nind + 1
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -269,10 +273,12 @@ rmodif,87,10,coilfront_shim22
 rmodif,88,10,coilfront_shim23
 rmodif,89,10,coilfront_shim24
 ! kill the contact for end plate
-rmodif,40,10,-0.5e-3
+! rmodif,40,10,-0.5e-3
 ! kill the contact for the v-key and h-key
-rmodif,38,10,-1.0e-3 
-rmodif,39,10,-1.0e-3 
+rmodif,38,10,-0.2e-3 
+rmodif,39,10,-0.2e-3 
+! collar pair
+rmodif,37,10,gap_collar 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! kill the yoke for Collaring
@@ -286,21 +292,21 @@ rmodif,39,10,-1.0e-3
 ! cmsel,a,eplate
 ! allsel,below,volu
 ! ekill,all
-! ! fix the displacement for the killed elements
-! csys,0
-! nsel,u,loc,x,0
-! nsel,u,loc,y,0
-! nsel,u,loc,z,0
-! d,all,ux,0
-! d,all,uy,0
-! d,all,uz,0
+! fix the displacement for the killed elements
+!csys,0
+!nsel,u,loc,x,0
+!nsel,u,loc,y,0
+!nsel,u,loc,z,0
+!d,all,ux,0
+!d,all,uy,0
+!d,all,uz,0
 ! ! negative contact between the yoke and collar
 ! rmodif,33,10,-1.5e-3
 ! rmodif,34,10,-1.5e-3
 
 alls
-deltim,0.2
-neqit,35
+deltim,0.5
+neqit,45
 time,nind
 solve
 
@@ -309,25 +315,25 @@ solve
 ! /title, Structure assembly
 ! nind = nind + 1
 
-! ! alive the yoke
-! cmsel,s,yoke
-! cmsel,a,shell
+! alive the yoke
+!cmsel,s,yoke
+!cmsel,a,shell
 ! cmsel,a,rod
 ! cmsel,a,nut
 ! cmsel,a,pad
 ! cmsel,a,hkey
 ! cmsel,a,vkey
 ! cmsel,a,eplate
-! allsel,below,volu
-! ealive,all
-! ! kill the constrains
-! csys,0
-! nsel,u,loc,x,0
-! nsel,u,loc,y,0
-! nsel,u,loc,z,0
-! ddele,all,ux
-! ddele,all,uy
-! ddele,all,uz
+!allsel,below,volu
+!ealive,all
+! kill the constrains
+!csys,0
+!nsel,u,loc,x,0
+!nsel,u,loc,y,0
+!nsel,u,loc,z,0
+!ddele,all,ux
+!ddele,all,uy
+!ddele,all,uz
 ! ! zero contact between the yoke and collar
 ! rmodif,33,10,0
 ! rmodif,34,10,0
@@ -341,46 +347,17 @@ solve
 ! solve
 
 ! ----------------------------------------------
-! - Step 3 - Longitudinal Prestress
-/title, Axial loading 50percent
+! - Step 2 - Longitudinal Prestress
+/title, Axial loading
 nind = nind + 1
+
 !cmsel,s,eplate
 !alls,below,volu
 !asel,r,loc,z,length+teplate
 !nsla,r
 !sf,all,pres,plate_pres
 
-rmodif,40,10,interf_eplate*0.5
-
-alls
-time,nind
-deltim,0.5
-solve
-
-! - step 3 - bladder & key
-/title, Key insertion 10percent
-nind = nind + 1
-
-! horizontal key
-rmodif,38,10,interf_hkey*0.1
-! vertialca key
-rmodif,39,10,interf_vkey*0.1
-
-alls
-time,nind
-deltim,0.5
-solve
-
-! ----------------------------------------------
-! - Step 3 - Longitudinal Prestress
-/title, Axial loading 100percent
-nind = nind + 1
-!cmsel,s,eplate
-!alls,below,volu
-!asel,r,loc,z,length+teplate
-!nsla,r
-!sf,all,pres,plate_pres
-
+! axial loading interference
 rmodif,40,10,interf_eplate
 
 alls
@@ -389,7 +366,7 @@ deltim,0.5
 solve
 
 ! - step 3 - bladder & key
-/title, Key insertion 100percent
+/title, v&h-key shimming
 nind = nind + 1
 
 ! horizontal key
@@ -403,7 +380,7 @@ deltim,0.5
 solve
 
 ! ------------------------
-! - Step 5 - Cooldown
+! - Step 4 - Cooldown
 /title, Cool-Down
 nind = nind + 1
 alls
@@ -416,7 +393,7 @@ neqit,35
 solve
 
 ! ------------------------
-! - Step 6 - Powering
+! - Step 5 - Powering
 /title, Powering
 nind = nind + 1
 

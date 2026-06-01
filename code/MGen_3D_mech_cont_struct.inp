@@ -69,7 +69,7 @@ gap_collarpair= -0.01e-3
  *use,ContactPropMacro.mac,42,'conta174',0,1,mu_all,0e-6,142,'targe170'
 
  ! End plate - Rod
- *use,ContactPropMacro.mac,43,'conta174',0,1,mu_all,0e-6,143,'targe170'
+ *use,ContactPropMacro.mac,43,'conta174',5,1,mu_all,0e-6,143,'targe170'
 
  ! Rod - nut
  *use,ContactPropMacro.mac,44,'conta174',5,1,mu_all,0e-6,144,'targe170'
