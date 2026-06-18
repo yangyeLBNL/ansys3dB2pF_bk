@@ -233,7 +233,7 @@ l_rod = length+h_nut+teplate+5e-3
 OR_collar = rin_yoke
 
 ! Notch size
-t_notch   = 38
+t_notch   = 40
 l_flat    = 10e-3
 t_notch2   = acos(cos(t_notch)-l_flat/OR_collar)   !find 2nd angle using xback
 ! dz_collar = 50e-3    ! For visualization purposes
@@ -270,3 +270,13 @@ w_eplate = OR_collar+tpad-h_ykey
 h_eplate = OR_collar+tpad-h_ykey
 rfillet_eplate = 20e-3
 ! --------------------------------------------------
+! Lamination
+n_shell  = 6
+dz_shell = length/(n_shell-0.5)
+n_pad  = 10
+dz_pad = length/(n_pad-0.5)
+n_collar = 5
+dz_collar = (length-coil_length+end_length)/n_collar
+n_yoke = 10
+dz_yoke = length/(n_yoke-0.5)
+

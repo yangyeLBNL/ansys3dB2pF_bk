@@ -24,13 +24,12 @@
 
 ! - Define Contacts
 interf_collar = 0e-6
-gap_collarpair= -0.01e-3
 
 ! Filler - Collar Top
 *use,ContactPropMacro.mac,30,'conta174',0,1,mu_all,0e-6,130,'targe170'
 
-! Filler - Collar Bot
-!*use,ContactPropMacro.mac,31,'conta174',0,1,mu_all,0e-6,131,'targe170'
+! Collar_bot (upper) - collar_fil
+*use,ContactPropMacro.mac,31,'conta174',0,4,mu_all,0e-6,131,'targe170'
 
 ! Filler - Collar Filler 
 *use,ContactPropMacro.mac,32,'conta174',0,1,mu_all,0e-6,132,'targe170'
@@ -46,35 +45,32 @@ gap_collarpair= -0.01e-3
 
 ! do not lock the collar
 !! Collar - Key
-!*use,ContactPropMacro.mac,36,'conta174',0,1,mu_all,0e-6,136,'targe170'
+!*use,ContactPropMacro.mac,36,'conta174',0,4,mu_all,0e-6,136,'targe170'
 
-! Collar_bot - collar_fil
-*use,ContactPropMacro.mac,37,'conta174',0,1,mu_all,gap_collarpair,137,'targe170'
+! Collar_bot (side) - collar_fil
+*use,ContactPropMacro.mac,37,'conta174',0,4,mu_all,0e-6,137,'targe170'
 
 ! h-key - iron Yoke
-*use,ContactPropMacro.mac,38,'conta174',0,1,mu_all,0e-6,138,'targe170'
+*use,ContactPropMacro.mac,38,'conta174',0,4,mu_all,0e-6,138,'targe170'
 
 ! v-key - iron yoke
-*use,ContactPropMacro.mac,39,'conta174',0,1,mu_all,0e-6,139,'targe170'
+*use,ContactPropMacro.mac,39,'conta174',0,4,mu_all,0e-6,139,'targe170'
 
-! EPlate - Coil
-*use,ContactPropMacro.mac,40,'conta174',0,1,mu_all,0e-6,140,'targe170'
+! EPlate - End shoe1
+*use,ContactPropMacro.mac,40,'conta174',0,4,mu_all,0e-6,140,'targe170'
 
-*if,OR_eplate,eq,OR_shell,then
- ! Eplate - Shell
- *use,ContactPropMacro.mac,41,'conta174',5,1,mu_all,0e-6,141,'targe170'
- 
-*else
- ! End plate - Yoke
- *use,ContactPropMacro.mac,42,'conta174',0,1,mu_all,0e-6,142,'targe170'
+! EPlate - End shoe2
+*use,ContactPropMacro.mac,41,'conta174',0,4,mu_all,0e-6,141,'targe170'
 
- ! End plate - Rod
- *use,ContactPropMacro.mac,43,'conta174',5,1,mu_all,0e-6,143,'targe170'
+! End plate - Yoke
+*use,ContactPropMacro.mac,42,'conta174',0,1,mu_all,0e-6,142,'targe170'
 
- ! Rod - nut
- *use,ContactPropMacro.mac,44,'conta174',5,1,mu_all,0e-6,144,'targe170'
+! End plate - Rod
+! bonded the contact to improve the convergency
+*use,ContactPropMacro.mac,43,'conta174',5,1,mu_all,0e-6,143,'targe170'
 
-*endif
+! Rod - nut
+*use,ContactPropMacro.mac,44,'conta174',5,1,mu_all,0e-6,144,'targe170'
 
 ! ---------------------------------------------------------------------
 ! Coil - Nose Top - Layer 1
@@ -96,15 +92,35 @@ gap_collarpair= -0.01e-3
 ! Pole - Nose Fil
 *use,ContactPropMacro.mac,61,'conta174',0,1,mu_all,0e-6,161,'targe170'
 ! ---------------------------------------------------------------------
+! Laminated shell
+*do,i,1,n_shell-1
+ *use,ContactPropMacro.mac,70+i,'conta174',0,1,mu_all,0e-6,170+i,'targe170'
+*enddo
+
+! Laminated Pad
+*do,i,1,n_pad-1
+ *use,ContactPropMacro.mac,200+i,'conta174',0,1,mu_all,0e-6,300+i,'targe170'
+*enddo
+
+! Laminated collar top
+*do,i,1,n_collar
+ *use,ContactPropMacro.mac,220+i,'conta174',0,1,mu_all,0e-6,320+i,'targe170'
+*enddo
+
+! Laminated collar ext
+*do,i,1,n_collar
+ *use,ContactPropMacro.mac,230+i,'conta174',0,1,mu_all,0e-6,330+i,'targe170'
+*enddo
+! ---------------------------------------------------------------------
+
 ! Filler - Collar Top
 type,30
+real,30
+mat ,30
 
 csys,1
-real,30
-mat,30
-
 ! Generate the target surface
-cmsel,s,filler
+cmsel,s,collar_top
 alls,below,volu
 asel,r,loc,x,r22+tfiller
 nsla,s,1
@@ -114,9 +130,8 @@ esurf,all
 alls
 
 ! Generate the contact surface
-cmsel,s,collar_top
+cmsel,s,filler
 alls,below,volu
-csys,1
 asel,r,loc,x,r22+tfiller
 nsla,s,1
 esln,s,0
@@ -124,43 +139,43 @@ type,30
 esurf,all
 alls
 
-! Filler - Collar Bot
-! type,31
+! -----------------------------------------------------------------
+! Collar bot (upper) - collar fil
+csys,0
+real,31
+mat ,31
 
-! csys,1
-! real,31
-! mat,31
+! Generate the target surface
+cmsel,s,collar_bot
+allsel,below,volu
+*get,ymax,kp,,mxloc,y
+asel,r,loc,y,ymax
+nsla,r,1
+esln,r,0
+type,131
+esurf,all
+allsel
 
-! ! Generate the target surface
-! cmsel,s,filler
-! alls,below,volu
-! asel,r,loc,x,r22+tfiller
-! nsla,s,1
-! esln,s,0
-! type,131
-! esurf,all
-! alls
+! Generate the contact surface
+cmsel,s,collar_fil
+allsel,below,volu
+asel,r,loc,y,ymax
+nsla,r,1
+esln,r,0
+type,31
+esurf,all
+allsel
 
-! ! Generate the contact surface
-! cmsel,s,collar_bot
-! alls,below,volu
-! csys,1
-! asel,r,loc,x,r22+tfiller
-! nsla,s,1
-! esln,s,0
-! type,31
-! esurf,all
-! alls
-
+! -----------------------------------------------------------------
 ! Filler - Collar Filler 
 type,32
+real,32
+mat ,32
 
 csys,1
-real,32
-mat,32
-
-cmsel,s,filler
+cmsel,s,collar_fil
 alls,below,volu
+csys,1
 asel,r,loc,x,r22+tfiller
 nsla,s,1
 esln,s,0
@@ -169,9 +184,8 @@ esurf,all
 alls
 
 ! Generate the contact surface
-cmsel,s,collar_fil
+cmsel,s,filler
 alls,below,volu
-csys,1
 asel,r,loc,x,r22+tfiller
 nsla,s,1
 esln,s,0
@@ -258,33 +272,33 @@ type,35
 esurf,all
 allsel
 
-! ! -----------------------------------------------------------------
-! ! Collar - Key
-! csys,0
-! real,36
-! mat ,36
+! -----------------------------------------------------------------
+!! Collar - Key
+!csys,0
+!real,36
+!mat ,36
 
-! ! Generate the target surface
-! cmsel,s,ckey
-! allsel,below,volu
-! *get,ymax,kp,,mxloc,y
-! *get,ymin,kp,,mnloc,y
-! asel,r,loc,y,ymax
-! nsla,r,1
-! esln,r,0
-! type,136
-! esurf,all
-! allsel
+!! Generate the target surface
+!cmsel,s,ckey
+!allsel,below,volu
+!*get,ymax,kp,,mxloc,y
+!*get,ymin,kp,,mnloc,y
+!asel,r,loc,y,ymax
+!nsla,r,1
+!esln,r,0
+!type,136
+!esurf,all
+!allsel
 
-! ! Generate the contact surface
-! cmsel,s,collar_bot
-! allsel,below,volu
-! asel,r,loc,y,ymax
-! nsla,r,1
-! esln,r,0
-! type,36
-! esurf,all
-! allsel
+!! Generate the contact surface
+!cmsel,s,collar_bot
+!allsel,below,volu
+!asel,r,loc,y,ymax
+!nsla,r,1
+!esln,r,0
+!type,36
+!esurf,all
+!allsel
 
 ! -----------------------------------------------------------------
 ! Collar bot - collar fil
@@ -296,13 +310,8 @@ mat ,37
 cmsel,s,collar_bot
 allsel,below,volu
 *get,xmin,kp,,mnloc,x
-asel,r,loc,x,xmin
-cm,tmp,area
-cmsel,s,collar_bot
-allsel,below,volu
 *get,ymax,kp,,mxloc,y
-asel,r,loc,y,ymax
-cmsel,a,tmp
+asel,r,loc,x,xmin
 nsla,r,1
 esln,r,0
 type,137
@@ -313,11 +322,7 @@ allsel
 cmsel,s,collar_fil
 allsel,below,volu
 asel,r,loc,x,xmin
-cm,tmp,area
-cmsel,s,collar_fil
-allsel,below,volu
-asel,r,loc,y,ymax
-cmsel,a,tmp
+asel,r,loc,y,0,ymax
 nsla,r,1
 esln,r,0
 type,37
@@ -392,12 +397,12 @@ esurf,all
 allsel
 
 !----------------------------------------------------------------------
-! EPlate - Coil
+! EPlate - End shoe1
 type,40
 
 csys,1
 real,40
-mat,40
+mat ,40
 
 ! Generate the target surface
 cmsel,s,eplate
@@ -411,10 +416,8 @@ alls
 
 ! Generate the contact surface
 cmsel,s,layer1
-cmsel,a,layer2
 cmsel,a,interlay
 alls,below,volu
-csys,1
 asel,r,loc,z,length
 nsla,s,1
 esln,s,0
@@ -422,8 +425,8 @@ type,40
 esurf,all
 allsel
 
-*if,OR_eplate,eq,OR_shell,then
-! endplate - shell (welding)
+!----------------------------------------------------------------------
+! EPlate - End shoe2
 type,41
 
 csys,1
@@ -436,14 +439,13 @@ alls,below,volu
 asel,r,loc,z,length
 nsla,s,1
 esln,s,0
-type,140
+type,141
 esurf,all
 alls
 
 ! Generate the contact surface
-cmsel,s,shell
+cmsel,s,layer2
 alls,below,volu
-csys,1
 asel,r,loc,z,length
 nsla,s,1
 esln,s,0
@@ -451,7 +453,6 @@ type,41
 esurf,all
 allsel
 
-*else
 ! -----------------------------------------------------------------
 ! End plate - Yoke
 type,42
@@ -544,7 +545,6 @@ allsel
 
 csys,0
 
-*endif
 
 ! -----------------------------------------------------------------
 ! - Coil to Nose
@@ -708,3 +708,126 @@ esurf,all
 alls
 ! -----------------------------------------------------------------
 alls
+
+! -----------------------------------------------------------------
+! shell-i - shell-j
+*do,i,1,n_shell-1
+ type,70+i
+ real,70+i
+ mat ,70+i
+
+ ! Generate the target surface
+ cmsel,s,shell%i%
+ allsel,below,volu
+ *get,zmax,kp,,mxloc,z
+ asel,r,loc,z,zmax
+ nsla,s,1
+ esln,s,0
+ type,170+i
+ esurf,all
+ allsel
+
+ ! Generate the contact surface
+ cmsel,s,shell%i+1%
+ allsel,below,volu
+ *get,zmin,kp,,mnloc,z
+ asel,r,loc,z,zmin
+ nsla,s,1
+ esln,s,0
+ type,70+i
+ esurf,all
+ allsel
+*enddo
+
+
+! -----------------------------------------------------------------
+! pad1 - pad2
+*do,i,1,n_pad-1
+ type,200+i
+ real,200+i
+ mat ,200+i
+
+ ! Generate the target surface
+ cmsel,s,pad%i%
+ allsel,below,volu
+ *get,zmax,kp,,mxloc,z
+ asel,r,loc,z,zmax
+ nsla,s,1
+ esln,s,0
+ type,300+i
+ esurf,all
+ allsel
+
+ ! Generate the contact surface
+ cmsel,s,pad%i+1%
+ allsel,below,volu
+ *get,zmin,kp,,mnloc,z
+ asel,r,loc,z,zmin
+ nsla,s,1
+ esln,s,0
+ type,200+i
+ esurf,all
+ allsel
+*enddo
+
+! -----------------------------------------------------------------
+! collar_top_i - collar_top_j
+*do,i,1,n_collar
+ type,220+i
+ real,220+i
+ mat ,220+i
+
+ ! Generate the target surface
+ cmsel,s,collar_top_%i-1%
+ allsel,below,volu
+ *get,zmax,kp,,mxloc,z
+ asel,r,loc,z,zmax
+ nsla,s,1
+ esln,s,0
+ type,320+i
+ esurf,all
+ allsel
+
+ ! Generate the contact surface
+ cmsel,s,collar_top_%i%
+ allsel,below,volu
+ *get,zmin,kp,,mnloc,z
+ asel,r,loc,z,zmin
+ nsla,s,1
+ esln,s,0
+ type,220+i
+ esurf,all
+ allsel
+*enddo
+
+! -----------------------------------------------------------------
+! collar_ext_i - collar_ext_j
+*do,i,1,n_collar
+ type,230+i
+ real,230+i
+ mat ,230+i
+
+ ! Generate the target surface
+ cmsel,s,collar_bot_%i-1%
+ cmsel,a,collar_fil_%i-1%
+ allsel,below,volu
+ *get,zmax,kp,,mxloc,z
+ asel,r,loc,z,zmax
+ nsla,s,1
+ esln,s,0
+ type,330+i
+ esurf,all
+ allsel
+
+ ! Generate the contact surface
+ cmsel,s,collar_bot_%i%
+ cmsel,a,collar_fil_%i%
+ allsel,below,volu
+ *get,zmin,kp,,mnloc,z
+ asel,r,loc,z,zmin
+ nsla,s,1
+ esln,s,0
+ type,230+i
+ esurf,all
+ allsel
+*enddo

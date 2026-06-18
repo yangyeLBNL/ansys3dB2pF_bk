@@ -7,15 +7,16 @@ nropt,full
 lnsrch,on
 nind = 0
 
+! use the tapered shim at the middle plane or not
+if_taper_shim = 1
+
 ! bladder and key setup
-interf_hkey1 = 400e-6
-interf_hkey2 = 100e-6
-interf_vkey1 = 500e-6
-interf_vkey2 = 100e-6
+interf_hkey  = 400e-6
+interf_vkey  = 500e-6
 
 ! layer-1
 ! endshoe shim is applied here to create the tapered shim
-midplane_shim11 = 350e-6
+midplane_shim11 = 300e-6
 midplane_shim12 =   0e-6
 pole_shim1      =   0e-6
 poletip_shim1   =   0e-6
@@ -29,7 +30,7 @@ coilback_shim12 =   0e-6
 coilback_shim13 =   0e-6
 coilback_shim14 =   0e-6
 ! layer-2
-midplane_shim21 = 550e-6
+midplane_shim21 = 600e-6
 midplane_shim22 =   0e-6
 pole_shim2      =   0e-6
 poletip_shim2   =   0e-6
@@ -44,26 +45,17 @@ coilback_shim23 =   0e-6
 coilback_shim24 =   0e-6
 
 ! gap between two collar pair
-gap_collar_top1 = -0.5e-3
-gap_collar_top2 = -0.0e-3
-gap_collar_side1= -0.5e-3
-gap_collar_side2= -0.0e-3
+gap_collar_top  = -0.5e-3
+gap_collar_side = -0.5e-3
 
 ! axial loading
-interf_eplate1 = 1800e-6
-interf_eplate2 = 1800e-6
+interf_eplate = 1800e-6
 
 ! pole shim ramp size
 l_ramp =  80e-3
 
 ! collar key
-!interf_ckey = -0.5e-3
-
-! pad gap
-gap_pad = -0.1e-3
-
-! iteration of loading
-n_loading = 3
+interf_ckey = -0.3e-3
 
 ! tapered middle plane shim
 ! get the length of the end shoe
@@ -81,12 +73,6 @@ allsel,below,volu
 z0_mid = coil_length-end_length-200e-3
 z1_mid = z0eshoe+50e-3
 z2_mid = z1eshoe
-
-! z position of the closed collar
-z_collar = length-dz_collar
-
-! tapered key
-z_taper_key = length-dz_collar
 
 ! -----------------------------------------------
 ! change the contact stiffness for coil - wedge, coil-pole
@@ -115,93 +101,15 @@ rmodif,89,1,fkn
 rmodif,90,1,fkn
 rmodif,91,1,fkn
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!! change the material at the end of the collar
-!! save the element at the iron yoke
-!cmsel,s,collar
+rmodif,30,1,fkn
+rmodif,32,1,fkn
+
+! delete the ux = 0 at the x = 0
+!cmsel,s,yoke
 !allsel,below,volu
-!
-!!! change the coordinate system
-!csys,0
-!local,112,0,0,0,0,0,0,90
-!
-!!! count the element number
-!*get,nelem,elem,,count
-
-!!! save each element
-!*do,i,1,nelem
-!  ! get the minimum element id
-!  *get,ielem,elem,,num,min
-!  
-!  ! get the centriod location at the selected element
-!  *get,zelem,elem,ielem,cent,z
-!  
-!  ! set the material at each element
-!  *if,zelem,ge,z_collar2,then
-!    emodif,ielem,mat,mat_g10
-!    emodif,ielem,esys,112
-!  *endif
-!  
-!  ! remove the selected element
-!  esel,u,,,ielem
-!*enddo
-!csys,0
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! change the gap between the collars along the axial direction
-!
-*DIM,gapCollarTop ,table,4,1,,z
-*DIM,gapCollarSide,table,4,1,,z
-
-! z location
-gapCollarTop(1,0) = 0
-gapCollarTop(2,0) = z_collar
-gapCollarTop(3,0) = z_collar
-gapCollarTop(4,0) = length
-
-gapCollarSide(1,0) = 0
-gapCollarSide(2,0) = z_collar
-gapCollarSide(3,0) = z_collar
-gapCollarSide(4,0) = length
-
-! gap 
-gapCollarTop(1,1) = gap_collar_top1 
-gapCollarTop(2,1) = gap_collar_top1
-gapCollarTop(3,1) = gap_collar_top2
-gapCollarTop(4,1) = gap_collar_top2
-
-gapCollarSide(1,1) = gap_collar_side1
-gapCollarSide(2,1) = gap_collar_side1
-gapCollarSide(3,1) = gap_collar_side2
-gapCollarSide(4,1) = gap_collar_side2
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! tapered horizational and vertical key
-!
-*dim,interf_h_key,table,4,1,,z
-*dim,interf_v_key,table,4,1,,z
-
-! z location
-interf_h_key(1,0) = 0
-interf_h_key(2,0) = z_taper_key
-interf_h_key(3,0) = z_taper_key
-interf_h_key(4,0) = length
-
-interf_v_key(1,0) = 0
-interf_v_key(2,0) = z_taper_key
-interf_v_key(3,0) = z_taper_key
-interf_v_key(4,0) = length
-
-! interference
-interf_h_key(1,1) = interf_hkey1
-interf_h_key(2,1) = interf_hkey1
-interf_h_key(3,1) = interf_hkey2
-interf_h_key(4,1) = interf_hkey2
-
-interf_v_key(1,1) = interf_vkey1
-interf_v_key(2,1) = interf_vkey1
-interf_v_key(3,1) = interf_vkey2
-interf_v_key(4,1) = interf_vkey2
+!nsel,r,loc,x,0
+!ddele,all
+!allsel
 
 ! ----------------------------------------------
 ! - Step 1 - Lock the pad
@@ -241,18 +149,40 @@ noseShim2(4,1) = 0.0
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! tapered middle plane shim
 !!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! layer-1
-! end shoe shim = shim thickness(z)
-cmsel,s,layer1
-cmsel,a,interlay
-allsel,below,volu
-nsel,r,loc,y,-mesh_size/10,mesh_size/10
+! uniform middle plane shim
+*if,if_taper_shim,eq,0,then
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ ! layer-1
+ ! end shoe shim = shim thickness
+ cmsel,s,layer1
+ cmsel,a,interlay
+ allsel,below,volu
+ nsel,r,loc,y,-mesh_size/10,mesh_size/10
+ d,all,uy,midplane_shim11
+  
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ ! layer-2
+ ! end shoe shim = shim thickness
+ cmsel,s,layer2
+ cmsel,a,filler
+ allsel,below,volu
+ nsel,r,loc,y,-mesh_size/10,mesh_size/10
+ d,all,uy,midplane_shim21
  
-! total node number at the boundary
-*get,nnode,node,,count
+! tapered middle plane shim
+*else
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ ! layer-1
+ ! end shoe shim = shim thickness(z)
+ cmsel,s,layer1
+ cmsel,a,interlay
+ allsel,below,volu
+ nsel,r,loc,y,-mesh_size/10,mesh_size/10
  
-*do,i,1,nnode
+ ! total node number at the boundary
+ *get,nnode,node,,count
+ 
+ *do,i,1,nnode
   ! get the minimum node id
   *get,inode,node,,num,min
   ! get the z location at this node
@@ -274,17 +204,17 @@ nsel,r,loc,y,-mesh_size/10,mesh_size/10
   nsel,u,,,inode
 *enddo
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! layer-2
-! end shoe shim = shim thickness(z)
-cmsel,s,layer2
-cmsel,a,filler
-allsel,below,volu
-nsel,r,loc,y,-mesh_size/10,mesh_size/10
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ ! layer-2
+ ! end shoe shim = shim thickness(z)
+ cmsel,s,layer2
+ cmsel,a,filler
+ allsel,below,volu
+ nsel,r,loc,y,-mesh_size/10,mesh_size/10
  
-! total node number at the boundary
-*get,nnode,node,,count
-*do,i,1,nnode
+ ! total node number at the boundary
+ *get,nnode,node,,count
+ *do,i,1,nnode
   ! get the minimum node id
   *get,inode,node,,num,min
   ! get the z location at this node
@@ -305,6 +235,8 @@ nsel,r,loc,y,-mesh_size/10,mesh_size/10
   ! remove the select node
   nsel,u,,,inode
 *enddo
+
+*endif
 
 ! Pole Shim - Tabular
 ! interf_pole = 500e-6
@@ -350,19 +282,20 @@ rmodif,89,10,coilfront_shim24
 ! kill the contact for end plate
 ! rmodif,40,10,-0.5e-3
 ! kill the contact for the v-key and h-key
-!rmodif,38,10,-0.0e-3 
-!rmodif,39,10,-0.0e-3 
+rmodif,38,10,-0.2e-3 
+rmodif,39,10,-0.2e-3 
 ! collar pair
-!rmodif,31,10,gap_collar_top
-!rmodif,37,10,gap_collar_side
-rmodif,31,10,%gapCollarTop%
-rmodif,37,10,%gapCollarSide%
+rmodif,31,10,gap_collar_top
+rmodif,37,10,gap_collar_side
 ! collar key
-!rmodif,36,10,interf_ckey
-! pad
-*do,i,1,n_pad
- rmodif,200+i,10,gap_pad
-*enddo
+rmodif,36,10,interf_ckey
+
+! axial loading interference
+rmodif,40,10,interf_eplate
+! horizontal key
+rmodif,38,10,interf_hkey
+! vertical key
+rmodif,39,10,interf_vkey
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! kill the yoke for Collaring
@@ -384,6 +317,9 @@ rmodif,37,10,%gapCollarSide%
 !d,all,ux,0
 !d,all,uy,0
 !d,all,uz,0
+! ! negative contact between the yoke and collar
+! rmodif,33,10,-1.5e-3
+! rmodif,34,10,-1.5e-3
 
 alls
 deltim,0.5
@@ -415,6 +351,11 @@ solve
 !ddele,all,ux
 !ddele,all,uy
 !ddele,all,uz
+! ! zero contact between the yoke and collar
+! rmodif,33,10,0
+! rmodif,34,10,0
+! ! zero contact between the end plate and end shoe
+! rmodif,40,10,0
 
 ! alls
 ! deltim,0.5
@@ -423,32 +364,37 @@ solve
 ! solve
 
 ! ----------------------------------------------
-! - Step 2 - Axial loading -> azimuthal loading
-*do,i,1,n_loading
- /title, axial loading step-%i%
- nind = nind + 1
+! - Step 2 - Longitudinal Prestress
+!/title, Axial loading
+!nind = nind + 1
 
- ! axial loading interference
- rmodif,40,10,interf_eplate1*i/n_loading
- rmodif,41,10,interf_eplate2*i/n_loading
+!cmsel,s,eplate
+!alls,below,volu
+!asel,r,loc,z,length+teplate
+!nsla,r
+!sf,all,pres,plate_pres
 
- alls
- time,nind
- deltim,0.5
- solve
+! axial loading interference
+!rmodif,40,10,interf_eplate
 
- /title, azimuthal loading step-%i%
- nind = nind + 1
+!alls
+!time,nind
+!deltim,0.5
+!solve
 
- ! azimuthal loading interference
- rmodif,38,10,interf_hkey*i/n_loading
- rmodif,39,10,interf_vkey*i/n_loading
+! - step 3 - bladder & key
+!/title, v&h-key shimming
+!nind = nind + 1
 
- alls
- time,nind
- deltim,0.5
- solve
-*enddo
+! horizontal key
+!rmodif,38,10,interf_hkey
+! vertialca key
+!rmodif,39,10,interf_vkey
+
+!alls
+!time,nind
+!deltim,0.5
+!solve
 
 ! ------------------------
 ! - Step 4 - Cooldown

@@ -3,17 +3,17 @@ ANSYS script for the 3D mechanical analysis, EIC B2pF (bladder and key)
 
 ver.1 (05/27/2026)
    - magnet assembly with bladder and keys
+ver.2 (06/04/2026)
+   - change the contact setting to improve the convergence
 
 Y.Yang, G. Vallone (LBNL)
 
 ## simulation steps
-1. shimming the coil, then assemble the collar and yoke arround
-2. loading the coil with 50% of axial load
-3. loading the coil with 10% of azimuthal load 
-4. loading the coil with 100% of axial load
-5. loading the coil with 100% of azimuthal load 
-6. cool-down
-7. powering
+1. middle plane shimming, install the structures
+2. loading the coil with 100% of axial load
+3. loading the coil with 100% of azimuthal load 
+4. cool-down
+5. powering
 
 ## contact stiffness
 The contact stiffness is calculated by considering 100 $\mu$m insulation can penetrate into the metal part. The normal contact stiffness is calculated as
@@ -75,6 +75,10 @@ The collar is laminated and it has very low longitudinal modulus. We assume the 
 |53          |153        |coil (layer-2)                   |nose bot                   |frictional|
 |60          |160        |pole tip                         |nose top                   |frictional|
 |61          |161        |pole tip                         |nose bot                   |frictional|
+|70+i        |170+i      |shell-i                          |shell-j                    |frictional|
+|200+i       |300+i      |pad-i                            |pad-j                      |frictional|
+|220+i       |320+i      |collar top-i                     |collar top-j               |frictional|
+|230+i       |330+i      |collar ext-i                     |collar ext-j               |frictional|
 
 ## material
 | part            | material       |
@@ -84,7 +88,8 @@ The collar is laminated and it has very low longitudinal modulus. We assume the 
 | wedge           | Al-Br          |
 | end spacer      | Al-Br          |
 | end shoe        | Al-Br          |
-| axial rod       | A7075          |
+| axial rod       | SS316          |
+| shell           | A6061          |
 
 ## interference thickness
 | middle plane | pole-coil | pole tip-coil | wedge-coil | espacer-coil front | espacer-coil back  | end shoe-coil  | axial shim |
@@ -113,10 +118,19 @@ $$
 The pole shim also has the ramp region. Need to determine the ramp region from the end of the straight section, `l_ramp`. 
 
 ## case study
-| case       | collar gap | mid shim      | hkey  | vkey  | axial interf | note       |
-|------------|------------|---------------|-------|-------|--------------|------------|
-| case0      | 0.5mm      | 0.15mm/0.15mm | 0.0mm | 1.0mm | 2.5mm        |            |
-| case1      | 0.1mm      | 0.40mm/0.60mm | 0.1mm | 0.3mm | 2.5mm        |            |
-| case2      | 0.5mm      | 0.40mm/0.60mm | 0.1mm | 0.3mm | 2.5mm        |            |
-| case3      | 0.5mm      | 0.40mm/0.60mm | 0.1mm | 0.3mm | 2.5mm        | al shell   |
-| case4      | 0.5mm      | 0.40mm/0.60mm | 0.1mm | 0.3mm | 2.5mm        | ss rod     |
+| case       | collar gap | mid shim      | hkey  | vkey  | axial interf | `z1_mid`   | `z0_mid`       |
+|------------|------------|---------------|-------|-------|--------------|------------|----------------|
+| case0      | 0.3mm      | 0.15mm/0.15mm | 0.0mm | 1.0mm | 1.8mm        | `z0eshoe`  | `coil_length-end_length`       |
+| case1      | 0.5mm      | 0.40mm/0.60mm | 0.2mm | 0.3mm | 1.8mm        | `z0eshoe`  | `coil_length-end_length-150e-3`       |
+| case2      | 0.5mm      | 0.40mm/0.60mm | 0.2mm | 0.3mm | 1.8mm        | `z0eshoe+20e-3` | `coil_length-end_length-150e-3`       |
+| case3      | 0.5mm      | 0.40mm/0.60mm | 0.2mm | 0.3mm | 1.8mm        | `z0eshoe+50e-3` | `coil_length-end_length`       |
+| case4      | 0.5mm      | 0.40mm/0.60mm | 0.2mm | 0.3mm | 1.8mm        | `z0eshoe-20e-3` | `coil_length-end_length-150e-3`       |
+| case5      | 0.5mm      | 0.40mm/0.60mm | 0.2mm | 0.3mm | 1.8mm        | `z0eshoe+50e-3` | `coil_length-end_length+10e-3`   |
+| case6      | 0.5mm      | 0.40mm/0.60mm | 0.2mm | 0.3mm | 1.8mm        | `z0eshoe+50e-3` | `coil_length-end_length+20e-3`   |
+| case7      | 0.5mm      | 0.40mm/0.60mm | 0.2mm | 0.3mm | 1.8mm        | `z0eshoe+50e-3` | `coil_length-end_length-250e-3`   |
+| case8      | 0.5mm      | 0.40mm/0.60mm | 0.2mm | 0.3mm | 1.8mm        | `z0eshoe+50e-3` | `coil_length-end_length-150e-3`   |
+| case9      | 0.5mm      | 0.40mm/0.60mm | 0.2mm | 0.3mm | 1.8mm        | `z0eshoe+25e-3` | `coil_length-end_length-60e-3`  |
+| case10     | 0.0mm      | 0.40mm/0.60mm | 0.3mm | 0.4mm | 1.8mm        | `z0eshoe+50e-3` | `coil_length-end_length-150e-3`  |
+| case11     | 0.3mm      | 0.40mm/0.60mm | 0.3mm | 0.5mm | 1.85mm       | `z0eshoe+50e-3` | `coil_length-end_length-350e-3`  |
+| case12     | 0.5mm      | 0.40mm/0.60mm | 0.4mm | 0.5mm | 2.05mm       | `z0eshoe+50e-3` | `coil_length-end_length-200e-3`  |
+| case13     | 0.5mm      | 0.40mm/0.60mm | 0.2mm | 0.3mm | 1.8mm        | `z0eshoe+50e-3` | `coil_length-end_length-300e-3`  |

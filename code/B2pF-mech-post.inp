@@ -54,6 +54,7 @@ db_name = 'B2pF_3D'
 /sys,del %db_name%*.png
 
 ! record the maximum stress to file
+!/expand,2,rect,half,0,1e-6,0,2,rect,half,1e-6,0,0
 
 *cfopen,%db_name%_peak_stress,txt
 *vwrite,'step','part','smax'
@@ -201,7 +202,17 @@ db_name = 'B2pF_3D'
   /rename,%db_name%000,png,,%db_name%_coil2collarTop_contpres_case%icase%,png
   
   allsel
+
+  esel,s,type,,31
+  esel,a,type,,37
   
+  /show,png
+  plnsol,cont,gap
+  /show,close
+  /rename,%db_name%000,png,,%db_name%_collar2collar_contgap_case%icase%,png
+
+  allsel
+
   ! coil - collar-fil
   cmsel,s,layer2
   allsel,below,volu
@@ -419,8 +430,8 @@ plnsol,u,x
 *cfopen,%db_name%_force,txt
 *vwrite,
 ('force balance at z = 0 plane')
-*vwrite,'step','coil','ins','wedge','collar','ckey','yoke','shell','rod','total'
-(1A5,9A10)
+*vwrite,'step','coil','ins','wedge','collar','ckey','yoke','pad','shell','rod','total'
+(1A5,10A10)
 
 rsys,0
 
@@ -469,13 +480,19 @@ rsys,0
  
  ! yoke
  cmsel,s,yoke
- cmsel,a,pad
+ allsel,below
+ nsel,r,loc,z,0
+ fsum,rsys
+ *get,fz_yoke,fsum,,item,fz
+ 
+ ! pad
+ cmsel,s,pad
  cmsel,a,hkey
  cmsel,a,vkey
  allsel,below
  nsel,r,loc,z,0
  fsum,rsys
- *get,fz_yoke,fsum,,item,fz
+ *get,fz_pad,fsum,,item,fz
  
  ! shell
  cmsel,s,shell
@@ -494,10 +511,10 @@ rsys,0
  *endif
  
  ! total
- fztot = fz_coil+fz_ins+fz_wedge+fz_collar+fz_ckey+fz_yoke+fz_shell+fz_rod
+ fztot = fz_coil+fz_ins+fz_wedge+fz_collar+fz_ckey+fz_yoke+fz_shell+fz_rod+fz_pad
  
-*vwrite,icase,fz_coil*1e-3,fz_ins*1e-3,fz_wedge*1e-3,fz_collar*1e-3,fz_ckey*1e-3,fz_yoke*1e-3,fz_shell*1e-3,fz_rod*1e-3,fztot*1e-3
-(1F5.0,9F10.1) 
+*vwrite,icase,fz_coil*1e-3,fz_ins*1e-3,fz_wedge*1e-3,fz_collar*1e-3,fz_ckey*1e-3,fz_yoke*1e-3,fz_pad*1e-3,fz_shell*1e-3,fz_rod*1e-3,fztot*1e-3
+(1F5.0,10F10.1) 
 *enddo
 
 ! check the force balance at the x = 0 plane (symmetrical plane)

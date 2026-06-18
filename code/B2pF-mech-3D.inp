@@ -125,13 +125,18 @@ save
 /inp,B2pF-geometry-fillers,inp
 /inp,B2pF-geometry-nosycollar,inp
 /inp,B2pF-geometry-yoke,inp
-
 ! ------------------------------------------------------
 allsel
 ! ------------------------------------------------------
 ! update the material
 ! ------------------------------------------------------
 local,111,1,0,0,0,0,0,0
+
+! pad
+cmsel,s,pad
+vsel,r,loc,z,coil_length-end_length,10
+allsel,below,volu
+emodif,all,mat,mat_ss
 
 ! coil end
 !cmsel,s,coil

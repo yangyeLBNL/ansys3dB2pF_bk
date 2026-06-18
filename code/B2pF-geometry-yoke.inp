@@ -266,14 +266,31 @@ adele,all, , , 1
 !------------------------
 ! extrude the geometry
 !------------------------
-! iron pad
+! laminated iron pad
 vsel,none
 cmsel,s,pad
 allsel,below,area
-vext,all, , , , , coil_length-end_length
-allsel,below,volu
-asel,r,loc,z,coil_length-end_length
-vext,all, , , , , end_length + t_endspacers
+
+*do,i,1,n_pad
+ *if,i,eq,1,then
+  vext,all, , , , , dz_pad*0.5
+ *else
+  cmsel,s,pad%i-1%
+  allsel,below,volu
+  *get,zmax,kp,,mxloc,z
+  asel,r,loc,z,zmax
+  vext,all,,,,,dz_pad
+ *endif
+ cm,pad%i%,volu
+*enddo
+
+*do,i,1,n_pad
+ *if,i,eq,1,then
+  cmsel,s,pad%i%
+ *else
+  cmsel,a,pad%i%
+ *endif
+*enddo
 cm,pad,volu
 vatt,mat_iron
 
@@ -290,29 +307,65 @@ vatt,mat_iron
 ! h-key
 vsel,none
 cmsel,s,hkey
-vext,all, , , , , coil_length-end_length
-allsel,below,volu
-asel,r,loc,z,coil_length-end_length
-vext,all, , , , , end_length + t_endspacers
+allsel,below,area
+
+*do,i,1,n_pad
+ *if,i,eq,1,then
+  vext,all, , , , , dz_pad*0.5
+ *else
+  cmsel,s,hkey%i-1%
+  allsel,below,volu
+  *get,zmax,kp,,mxloc,z
+  asel,r,loc,z,zmax
+  vext,all,,,,,dz_pad
+ *endif
+ cm,hkey%i%,volu
+*enddo
+
+*do,i,1,n_pad
+ *if,i,eq,1,then
+  cmsel,s,hkey%i%
+ *else
+  cmsel,a,hkey%i%
+ *endif
+*enddo
 cm,hkey,volu
 vatt,mat_ss
 
 ! v-key
 vsel,none
 cmsel,s,vkey
-vext,all, , , , , coil_length-end_length
-allsel,below,volu
-asel,r,loc,z,coil_length-end_length
-vext,all, , , , , end_length + t_endspacers
+allsel,below,area
+
+*do,i,1,n_pad
+ *if,i,eq,1,then
+  vext,all, , , , , dz_pad*0.5
+ *else
+  cmsel,s,vkey%i-1%
+  allsel,below,volu
+  *get,zmax,kp,,mxloc,z
+  asel,r,loc,z,zmax
+  vext,all,,,,,dz_pad
+ *endif
+ cm,vkey%i%,volu
+*enddo
+
+*do,i,1,n_pad
+ *if,i,eq,1,then
+  cmsel,s,vkey%i%
+ *else
+  cmsel,a,vkey%i%
+ *endif
+*enddo
 cm,vkey,volu
 vatt,mat_ss
 
 ! merge the h-key, v-key and pad
-cmsel,s,pad
-cmsel,a,hkey
-cmsel,a,vkey
-allsel,below,volu
-nummrg,kp,1e-6
+!cmsel,s,pad
+!cmsel,a,hkey
+!cmsel,a,vkey
+!allsel,below,volu
+!nummrg,kp,1e-6
 
 ! fine mesh for the holes
 csys,0
@@ -362,19 +415,20 @@ lsel,r,loc,y,ymin,ymax
 lesize,all,mesh_size*0.4
 
 ! mesh
-cmsel,s,pad
-allsel,below
-asel,r,loc,z,0
-allsel,below,area
-lesize,all,mesh_size
-type,5
-amesh,all
-type,1
-vsweep,all
-aclear,all
+!cmsel,s,pad
+!allsel,below
+!asel,r,loc,z,0
+!allsel,below,area
+!lesize,all,mesh_size
+!type,5
+!amesh,all
+!type,1
+!vsweep,all
+!aclear,all
 
 cmsel,s,hkey
 cmsel,a,vkey
+cmsel,a,pad
 allsel,below,volu
 esize,mesh_size
 vsweep,all
@@ -429,21 +483,29 @@ l,knum+4,knum+1
 
 al,all
 
-vext,all, , , , , coil_length-end_length
-cm,shell,volu
+! laminated shell
+*do,i,1,n_shell
+ *if,i,eq,1,then
+  vext,all, , , , , dz_shell*0.5
+ *else
+  cmsel,s,shell%i-1%
+  allsel,below,volu
+  *get,zmax,kp,,mxloc,z
+  asel,r,loc,z,zmax
+  vext,all,,,,,dz_shell
+ *endif
+ cm,shell%i%,volu
+*enddo
 
-! End Part 1
-alls,below,volu
-asel,r,loc,z,coil_length-end_length
-vext,all, , , , , end_length + t_endspacers
+*do,i,1,n_shell
+ *if,i,eq,1,then
+  cmsel,s,shell%i%
+ *else
+  cmsel,a,shell%i%
+ *endif
+*enddo
 cm,shell,volu
-
-cmsel,s,shell
-*if,OR_eplate,eq,OR_shell,then
- vatt,mat_ss
-*else
- vatt,mat_ss
-*endif
+vatt,mat_al
 
 ! mesh
 allsel,below,volu
@@ -471,7 +533,7 @@ asel,r,loc,z,length+teplate+h_nut
 vext,all, , , , , l_rod-length-teplate-h_nut
 cm,rod,volu
 
-vatt,mat_al
+vatt,mat_ss
 
 ! mesh
 allsel,below,volu

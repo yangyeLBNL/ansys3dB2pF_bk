@@ -216,7 +216,7 @@ cm,collar_fil,area
 asel,none
 cyl4,r_collar_hole_pos*cos(t_collar_hole),r_collar_hole_pos*sin(t_collar_hole),r_collar_hole
 cm,collar_hole,area
-agen,2,all, , , , ,dz_collar
+agen,2,all, , , , ,0
 cmsel,u,collar_hole
 cm,collar_hole_dz,area
 
@@ -239,12 +239,12 @@ cm,collar_fil,area
 
 ! Keypoints
 csys,1
-k,knum+1,rin_collar,0,dz_collar
-k,knum+2,OR_collar,0,dz_collar
-k,knum+3,OR_collar,t_end,dz_collar
+k,knum+1,rin_collar,0,
+k,knum+2,OR_collar,0,
+k,knum+3,OR_collar,t_end,
 
 csys,0
-k,knum+4,rin_collar,OR_collar*sin(t_end),dz_collar
+k,knum+4,rin_collar,OR_collar*sin(t_end),
 
 ! Lines
 csys,0
@@ -265,7 +265,7 @@ cm,collar_bot,area
 ! Key - Top
 rectng,x_ckey,x_ckey+w_ckey,y_ckey,y_ckey+h_ckey
 cm,ckey,area
-agen,2,all, , , , ,dz_collar
+agen,2,all, , , , ,0
 cmsel,u,ckey
 cm,ckey_dz,area
 
@@ -302,7 +302,7 @@ cmsel,s,collar_top
 vext,all, , , , ,coil_length-end_length
 !vatt,mat_n40_h
 vatt,mat_ss_h
-cm,collar_top,volu
+cm,collar_top_0,volu
 
 ! Merge with nose
 cmsel,a,collar_nose_top
@@ -310,13 +310,25 @@ alls,below,volu
 nummrg,kp,1e-6
 
 ! Extrude collar top end
-cmsel,s,collar_top
-alls,below,volu
-asel,r,loc,z,coil_length-end_length
-vext,all, , , , , end_length + t_endspacers
-!vatt,mat_n40_h
-vatt,mat_ss_h
-cmsel,a,collar_top
+*do,i,1,n_collar
+ *if,i,eq,1,then
+  cmsel,s,collar_top_0
+  allsel,below,volu
+ *else
+  cmsel,s,collar_top_%i-1%
+  allsel,below,volu
+ *endif
+ asel,r,loc,z,coil_length-end_length+dz_collar*(i-1)
+ vext,all,,,,,dz_collar
+ vatt,mat_ss_h
+ cm,collar_top_%i%,volu
+*enddo
+
+cmsel,s,collar_top_0
+*do,i,1,n_collar
+ cmsel,a,collar_top_%i%
+*enddo
+allsel,below,volu
 cm,collar_top,volu
 
 ! fine mesh for the holes
@@ -339,7 +351,7 @@ cmsel,s,collar_fil
 vext,all, , , , ,coil_length-end_length
 !vatt,mat_n40_h
 vatt,mat_ss_h
-cm,collar_fil,volu
+cm,collar_fil_0,volu
 
 ! Merge with nose
 cmsel,a,collar_nose_fil
@@ -347,13 +359,25 @@ alls,below,volu
 nummrg,kp,1e-6
 
 ! Extrude collar fil end
-cmsel,s,collar_fil
-alls,below,volu
-asel,r,loc,z,coil_length-end_length
-vext,all, , , , , end_length + t_endspacers
-!vatt,mat_n40_h
-vatt,mat_ss_h
-cmsel,a,collar_fil
+*do,i,1,n_collar
+ *if,i,eq,1,then
+  cmsel,s,collar_fil_0
+  allsel,below,volu
+ *else
+  cmsel,s,collar_fil_%i-1%
+  allsel,below,volu
+ *endif
+ asel,r,loc,z,coil_length-end_length+dz_collar*(i-1)
+ vext,all,,,,,dz_collar
+ vatt,mat_ss_h
+ cm,collar_fil_%i%,volu
+*enddo
+
+cmsel,s,collar_fil_0
+*do,i,1,n_collar
+ cmsel,a,collar_fil_%i%
+*enddo
+allsel,below,volu
 cm,collar_fil,volu
 
 ! fine mesh for the holes
@@ -375,17 +399,31 @@ cmsel,s,collar_bot
 vext,all, , , , ,coil_length-end_length
 !vatt,mat_n40_h
 vatt,mat_ss_h
-cm,collar_bot,volu
+cm,collar_bot_0,volu
 
 ! Extrude collar bot end
-cmsel,s,collar_bot
-alls,below,volu
-asel,r,loc,z,coil_length-end_length
-vext,all, , , , , end_length + t_endspacers
-!vatt,mat_n40_h
-vatt,mat_ss_h
-cmsel,a,collar_bot
+*do,i,1,n_collar
+ *if,i,eq,1,then
+  cmsel,s,collar_bot_0
+  allsel,below,volu
+ *else
+  cmsel,s,collar_bot_%i-1%
+  allsel,below,volu
+ *endif
+ asel,r,loc,z,coil_length-end_length+dz_collar*(i-1)
+ vext,all,,,,,dz_collar
+ vatt,mat_ss_h
+ cm,collar_bot_%i%,volu
+*enddo
+
+cmsel,s,collar_bot_0
+*do,i,1,n_collar
+ cmsel,a,collar_bot_%i%
+*enddo
+allsel,below,volu
 cm,collar_bot,volu
+
+cmsel,s,collar_bot
 vsweep,all
 
 ! Extrude key
@@ -399,11 +437,31 @@ vsweep,all
 vsel,none
 cmsel,s,ckey
 vext,all, , , , ,coil_length-end_length
-asel,r,loc,z,coil_length-end_length
-vext,all, , , , , end_length + t_endspacers
-vatt,mat_ss
-vsweep,all
+
+! Extrude key
+*do,i,1,n_collar
+ *if,i,eq,1,then
+  cmsel,s,ckey
+  allsel,below,volu
+ *else
+  cmsel,s,ckey_%i-1%
+  allsel,below,volu
+ *endif
+ asel,r,loc,z,coil_length-end_length+dz_collar*(i-1)
+ vext,all,,,,,dz_collar
+ vatt,mat_ss
+ cm,ckey_%i%,volu
+*enddo
+
+cmsel,s,ckey
+*do,i,1,n_collar
+ cmsel,a,ckey_%i%
+*enddo
+allsel,below,volu
 cm,ckey,volu
+
+cmsel,s,ckey
+vsweep,all
 ! ------------------------------------------
 ! Component Names
 cmsel,s,collar_top

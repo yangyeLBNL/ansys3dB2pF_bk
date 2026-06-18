@@ -154,6 +154,115 @@
 	cmdele,tmp
 *enddo
 
+! split shell
+*do,i,1,n_shell
+ cmsel,s,shell%i%
+ vgen,2,all,,,,,,,,0
+ cm,tmp,volu
+ cmsel,s,shell%i%
+ allsel,below,volu
+ vclear,all
+ vdele,all, , , 1
+ cmsel,s,tmp
+ cm,shell%i%,volu
+ cmdele,tmp
+*enddo
+
+cmsel,s,shell1
+*do,i,2,n_shell
+ cmsel,a,shell%i%
+*enddo
+cm,shell,volu
+
+! split pad
+*do,i,1,n_pad
+ cmsel,s,pad%i%
+ vgen,2,all,,,,,,,,0
+ cm,tmp,volu
+ cmsel,s,pad%i%
+ allsel,below,volu
+ vclear,all
+ vdele,all, , , 1
+ cmsel,s,tmp
+ cm,pad%i%,volu
+ cmdele,tmp
+*enddo
+
+cmsel,s,pad1
+*do,i,2,n_pad
+ cmsel,a,pad%i%
+*enddo
+cm,pad,volu
+
+! split collar top
+*do,i,0,n_collar
+ cmsel,s,collar_top_%i%
+ vgen,2,all,,,,,,,,0
+ cm,tmp,volu
+ cmsel,s,collar_top_%i%
+ allsel,below,volu
+ vclear,all
+ vdele,all, , , 1
+ cmsel,s,tmp
+ cm,collar_top_%i%,volu
+ cmdele,tmp
+*enddo
+
+cmsel,s,collar_top_0
+*do,i,1,n_collar
+ cmsel,a,collar_top_%i%
+*enddo
+cm,collar_top,volu
+
+! split collar bot
+*do,i,0,n_collar
+ cmsel,s,collar_bot_%i%
+ vgen,2,all,,,,,,,,0
+ cm,tmp,volu
+ cmsel,s,collar_bot_%i%
+ allsel,below,volu
+ vclear,all
+ vdele,all, , , 1
+ cmsel,s,tmp
+ cm,collar_bot_%i%,volu
+ cmdele,tmp
+*enddo
+
+cmsel,s,collar_bot_0
+*do,i,1,n_collar
+ cmsel,a,collar_bot_%i%
+*enddo
+cm,collar_bot,volu
+
+! split collar fil
+*do,i,0,n_collar
+ cmsel,s,collar_fil_%i%
+ vgen,2,all,,,,,,,,0
+ cm,tmp,volu
+ cmsel,s,collar_fil_%i%
+ allsel,below,volu
+ vclear,all
+ vdele,all, , , 1
+ cmsel,s,tmp
+ cm,collar_fil_%i%,volu
+ cmdele,tmp
+*enddo
+
+cmsel,s,collar_fil_0
+*do,i,1,n_collar
+ cmsel,a,collar_fil_%i%
+*enddo
+cm,collar_fil,volu
+
+cmsel,s,collar_bot
+cmsel,a,collar_fil
+cm,collar_ext,volu
+
+cmsel,s,collar
+cmsel,a,collar_ext
+cmsel,a,collar_top
+cm,collar,volu
+
 ! Split Coil
 ! *do,ll,1,Nlayer
 ! 	cmsel,s,coil%ll%

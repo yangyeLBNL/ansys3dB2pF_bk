@@ -32,6 +32,40 @@ d,all,uz,0
 !ddele,all
 
 ! ----------------------------------------------
+! - pad, h-keys
+! ----------------------------------------------
+csys,0
+cmsel,s,hkey
+allsel,below,volu
+*get,xmin,kp,,mnloc,x
+*get,xmax,kp,,mxloc,x
+*get,ymin,kp,,mnloc,y
+*get,ymax,kp,,mxloc,y
+cmsel,a,pad
+alls,below,volu
+nsel,r,loc,x,xmin
+nsel,r,loc,y,ymin,ymax
+cpintf,all,1e-6
+allsel
+
+! ----------------------------------------------
+! - pad, v-keys
+! ----------------------------------------------
+csys,0
+cmsel,s,vkey
+allsel,below,volu
+*get,xmin,kp,,mnloc,x
+*get,xmax,kp,,mxloc,x
+*get,ymin,kp,,mnloc,y
+*get,ymax,kp,,mxloc,y
+cmsel,a,pad
+alls,below,volu
+nsel,r,loc,x,xmin,xmax
+nsel,r,loc,y,ymin
+cpintf,all,1e-6
+allsel
+
+! ----------------------------------------------
 ! - Keys
 ! ----------------------------------------------
 ! Collar
@@ -47,11 +81,30 @@ alls
 ! ----------------------------------------------
 ! - Collars
 ! ----------------------------------------------
+! Couple the nose_top to collar_top
+csys,1
+cmsel,s,collar_nose_top
+cmsel,a,collar_top
+vsel,r,loc,z,0,coil_length-end_length
+allsel,below,volu
+asel,r,loc,x,r22+tfiller
+nsla,s,1
+cpintf,all,1e-6
+! Couple the nose_fil to collar_fil
+cmsel,s,collar_nose_fil
+cmsel,a,collar_fil
+vsel,r,loc,z,0,coil_length-end_length
+allsel,below,volu
+asel,r,loc,x,r22+tfiller
+nsla,s,1
+cpintf,all,1e-6
+csys,0
 ! Lock collar holes (cp)
 local,11,1, r_collar_hole_pos*cos(t_collar_hole),r_collar_hole_pos*sin(t_collar_hole),0, 0,0,0,
 csys,11
 alls
 ksel,r,loc,x,0,r_collar_hole+1e-3
+!ksel,r,loc,z,0,coil_length-end_length
 lslk,s,0
 asll,s,1
 nsla,s,1
